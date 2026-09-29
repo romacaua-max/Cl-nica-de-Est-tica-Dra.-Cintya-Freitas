@@ -23,26 +23,146 @@
             }
         }
     </script>
+    <style>
+        /* ===== ANIMAÇÕES DE ENTRADA (SCROLL REVEAL) ===== */
+        [data-reveal] {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        [data-reveal].is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Variações direcionais */
+        [data-reveal="left"] { transform: translateX(-50px); }
+        [data-reveal="right"] { transform: translateX(50px); }
+        [data-reveal="left"].is-visible,
+        [data-reveal="right"].is-visible { transform: translateX(0); }
+        [data-reveal="zoom"] { transform: scale(0.9); }
+        [data-reveal="zoom"].is-visible { transform: scale(1); }
+
+        /* Atraso em cascata */
+        [data-delay="1"] { transition-delay: 0.1s; }
+        [data-delay="2"] { transition-delay: 0.2s; }
+        [data-delay="3"] { transition-delay: 0.3s; }
+        [data-delay="4"] { transition-delay: 0.4s; }
+        [data-delay="5"] { transition-delay: 0.5s; }
+
+        /* ===== ANIMAÇÃO DO HERO ===== */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hero-anim { opacity: 0; animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) forwards; }
+        .hero-anim.d1 { animation-delay: 0.1s; }
+        .hero-anim.d2 { animation-delay: 0.25s; }
+        .hero-anim.d3 { animation-delay: 0.4s; }
+        .hero-anim.d4 { animation-delay: 0.55s; }
+
+        @keyframes floatImg {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+        .float-img { animation: floatImg 6s ease-in-out infinite; }
+
+        /* ===== BADGE PULSANTE ===== */
+        @keyframes softPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(179,146,104,0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(179,146,104,0); }
+        }
+        .pulse-badge { animation: softPulse 2.5s ease-in-out infinite; }
+
+        /* ===== BOTÃO WHATSAPP FLUTUANTE ===== */
+        @keyframes waPulse {
+            0% { box-shadow: 0 0 0 0 rgba(37,211,102,0.5); }
+            70% { box-shadow: 0 0 0 18px rgba(37,211,102,0); }
+            100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
+        }
+        .wa-float { animation: waPulse 2s infinite; }
+        .wa-float:hover { transform: scale(1.1) rotate(6deg); }
+
+        /* ===== ESTRELAS BRILHANDO ===== */
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.15); }
+        }
+        .twinkle i { animation: twinkle 1.8s ease-in-out infinite; }
+        .twinkle i:nth-child(2) { animation-delay: 0.2s; }
+        .twinkle i:nth-child(3) { animation-delay: 0.4s; }
+        .twinkle i:nth-child(4) { animation-delay: 0.6s; }
+        .twinkle i:nth-child(5) { animation-delay: 0.8s; }
+
+        /* ===== CARDS COM ELEVAÇÃO ANIMADA ===== */
+        .card-hover {
+            transition: transform 0.4s cubic-bezier(0.16,1,0.3,1),
+                        box-shadow 0.4s ease, border-color 0.4s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -12px rgba(179,146,104,0.25);
+            border-color: rgba(179,146,104,0.4);
+        }
+
+        /* ===== BOTÕES COM BRILHO ===== */
+        .btn-shine { position: relative; overflow: hidden; }
+        .btn-shine::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -120%;
+            width: 60%; height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-20deg);
+            transition: left 0.6s ease;
+        }
+        .btn-shine:hover::after { left: 140%; }
+
+        /* ===== BARRA DE PROGRESSO DE SCROLL ===== */
+        #scroll-progress {
+            position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+            background: linear-gradient(90deg, #B39268, #98774F);
+            z-index: 100; transition: width 0.1s ease;
+        }
+
+        /* ===== LINK DE NAV COM SUBLINHADO ===== */
+        .nav-link { position: relative; }
+        .nav-link::after {
+            content: ''; position: absolute; bottom: -4px; left: 0;
+            width: 0; height: 2px; background: #B39268;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after { width: 100%; }
+
+        /* Respeitar preferências de movimento reduzido */
+        @media (prefers-reduced-motion: reduce) {
+            *, [data-reveal] { animation: none !important; transition: none !important; opacity: 1 !important; transform: none !important; }
+        }
+    </style>
 </head>
 <body class="bg-clinic-sand text-clinic-dark font-sans antialiased">
+
+    <!-- Barra de progresso de scroll -->
+    <div id="scroll-progress"></div>
 
     <!-- Cabeçalho / Menu -->
     <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-clinic-gold/10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <img src="logo.jpg" alt="Dra. Cintya Freitas" class="h-12 w-auto object-contain rounded">
+                <img src="logo.jpg" alt="Dra. Cintya Freitas" class="h-12 w-auto object-contain rounded transition-transform duration-300 hover:scale-105">
             </div>
 
             <nav class="hidden md:flex gap-8 text-sm font-medium">
-                <a href="#inicio" class="hover:text-clinic-gold transition-colors">Início</a>
-                <a href="#procedimentos" class="hover:text-clinic-gold transition-colors">Procedimentos</a>
-                <a href="#localizacao" class="hover:text-clinic-gold transition-colors">Localização</a>
-                <a href="#galeria" class="hover:text-clinic-gold transition-colors">A Clínica</a>
-                <a href="#avaliacoes" class="hover:text-clinic-gold transition-colors">Avaliações</a>
-                <a href="#contato" class="hover:text-clinic-gold transition-colors">Contato</a>
+                <a href="#inicio" class="nav-link hover:text-clinic-gold transition-colors">Início</a>
+                <a href="#procedimentos" class="nav-link hover:text-clinic-gold transition-colors">Procedimentos</a>
+                <a href="#localizacao" class="nav-link hover:text-clinic-gold transition-colors">Localização</a>
+                <a href="#galeria" class="nav-link hover:text-clinic-gold transition-colors">A Clínica</a>
+                <a href="#avaliacoes" class="nav-link hover:text-clinic-gold transition-colors">Avaliações</a>
+                <a href="#contato" class="nav-link hover:text-clinic-gold transition-colors">Contato</a>
             </nav>
 
-            <a href="https://wa.me/9984358685?text=Olá,%20gostaria%20de%20agendar%20uma%20consulta!" target="_blank" class="bg-clinic-gold hover:bg-clinic-goldHover text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+            <a href="https://wa.me/9984358685?text=Olá,%20gostaria%20de%20agendar%20uma%20consulta!" target="_blank" class="btn-shine bg-clinic-gold hover:bg-clinic-goldHover text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all shadow-md hover:shadow-lg flex items-center gap-2 hover:scale-105">
                 <i class="fab font-bold fa-whatsapp"></i> Agendar Horário
             </a>
         </div>
@@ -53,29 +173,29 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div class="space-y-6">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-clinic-gold/10 text-clinic-gold text-xs font-semibold uppercase tracking-wider">
+                    <div class="hero-anim d1 pulse-badge inline-flex items-center gap-2 px-3 py-1 rounded-full bg-clinic-gold/10 text-clinic-gold text-xs font-semibold uppercase tracking-wider">
                         <i class="fas fa-star text-yellow-500"></i> Avaliação 5.0 no Google
                     </div>
-                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-clinic-dark leading-tight">
+                    <h1 class="hero-anim d2 text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-clinic-dark leading-tight">
                         Sua beleza e autoestima em <span class="italic text-clinic-gold">harmonia</span>.
                     </h1>
-                    <p class="text-base sm:text-lg text-gray-600 leading-relaxed">
+                    <p class="hero-anim d3 text-base sm:text-lg text-gray-600 leading-relaxed">
                         Tratamentos avançados em estética facial e corporal, depilação a laser e programas de emagrecimento com atendimento exclusivo em Estreito - MA.
                     </p>
-                    <div class="flex flex-col sm:flex-row gap-4 pt-2">
-                        <a href="https://wa.me/9984358685?text=Olá,%20gostaria%20de%20saber%20mais%20sobre%20os%20tratamentos!" target="_blank" class="bg-clinic-gold hover:bg-clinic-goldHover text-white px-8 py-3.5 rounded-full font-medium text-center shadow-lg transition-all">
+                    <div class="hero-anim d4 flex flex-col sm:flex-row gap-4 pt-2">
+                        <a href="https://wa.me/9984358685?text=Olá,%20gostaria%20de%20saber%20mais%20sobre%20os%20tratamentos!" target="_blank" class="btn-shine bg-clinic-gold hover:bg-clinic-goldHover text-white px-8 py-3.5 rounded-full font-medium text-center shadow-lg transition-all hover:scale-105">
                             Agendar Avaliação
                         </a>
-                        <a href="#procedimentos" class="border border-clinic-gold text-clinic-dark hover:bg-clinic-gold/5 px-8 py-3.5 rounded-full font-medium text-center transition-all">
+                        <a href="#procedimentos" class="border border-clinic-gold text-clinic-dark hover:bg-clinic-gold/5 px-8 py-3.5 rounded-full font-medium text-center transition-all hover:scale-105">
                             Ver Catálogo Completo
                         </a>
                     </div>
                 </div>
 
                 <!-- Foto Principal com Selo de Localização Discreto -->
-                <div class="relative">
-                    <div class="aspect-[4/3] sm:aspect-[16/10] rounded-2xl shadow-2xl overflow-hidden border-4 border-white relative group">
-                        <img src="hero.jpg" alt="Recepção Clínica Dra. Cintya Freitas" class="object-cover w-full h-full">
+                <div class="hero-anim d3 relative">
+                    <div class="float-img aspect-[4/3] sm:aspect-[16/10] rounded-2xl shadow-2xl overflow-hidden border-4 border-white relative group">
+                        <img src="hero.jpg" alt="Recepção Clínica Dra. Cintya Freitas" class="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110">
                         
                         <!-- Marcador no canto inferior da foto -->
                         <div class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 text-white text-xs flex items-center gap-1.5 shadow-md z-10">
@@ -91,7 +211,7 @@
     <!-- Catálogo de Procedimentos e Tratamentos -->
     <section id="procedimentos" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-16">
+            <div class="text-center max-w-2xl mx-auto mb-16" data-reveal>
                 <span class="text-xs font-semibold uppercase tracking-widest text-clinic-gold">Nossos Serviços</span>
                 <h2 class="text-3xl sm:text-4xl font-serif font-bold text-clinic-dark mt-2">Catálogo de Tratamentos</h2>
                 <p class="text-gray-600 mt-4">Procedimentos personalizados para cuidados faciais, corporais, saúde injetável e depilação a laser.</p>
@@ -99,11 +219,11 @@
 
             <!-- Categoria 1: Estética Facial & Rejuvenescimento -->
             <div class="mb-14">
-                <h3 class="text-2xl font-serif font-bold text-clinic-gold mb-6 border-b border-clinic-gold/20 pb-2 flex items-center gap-2">
+                <h3 class="text-2xl font-serif font-bold text-clinic-gold mb-6 border-b border-clinic-gold/20 pb-2 flex items-center gap-2" data-reveal="left">
                     <i class="fas fa-sparkles text-lg"></i> Estética Facial & Rejuvenescimento
                 </h3>
                 <div class="grid md:grid-cols-3 gap-6">
-                    <div class="bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 hover:shadow-lg transition-all flex flex-col justify-between">
+                    <div class="card-hover bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between" data-reveal data-delay="1">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <h4 class="font-serif font-bold text-lg text-clinic-dark">Limpeza de Pele Premium</h4>
@@ -118,7 +238,7 @@
                         </a>
                     </div>
 
-                    <div class="bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 hover:shadow-lg transition-all flex flex-col justify-between">
+                    <div class="card-hover bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between" data-reveal data-delay="2">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <h4 class="font-serif font-bold text-lg text-clinic-dark">Skinbooster</h4>
@@ -133,7 +253,7 @@
                         </a>
                     </div>
 
-                    <div class="bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 hover:shadow-lg transition-all flex flex-col justify-between">
+                    <div class="card-hover bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between" data-reveal data-delay="3">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <h4 class="font-serif font-bold text-lg text-clinic-dark">Botox Terço Superior</h4>
@@ -148,7 +268,7 @@
                         </a>
                     </div>
 
-                    <div class="bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 hover:shadow-lg transition-all flex flex-col justify-between">
+                    <div class="card-hover bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between" data-reveal data-delay="1">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <h4 class="font-serif font-bold text-lg text-clinic-dark">Botox Full Face</h4>
@@ -163,7 +283,7 @@
                         </a>
                     </div>
 
-                    <div class="bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 hover:shadow-lg transition-all flex flex-col justify-between">
+                    <div class="card-hover bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between" data-reveal data-delay="2">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <h4 class="font-serif font-bold text-lg text-clinic-dark">Fios de Sustentação (6 Un)</h4>
@@ -178,7 +298,7 @@
                         </a>
                     </div>
 
-                    <div class="bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 hover:shadow-lg transition-all flex flex-col justify-between">
+                    <div class="card-hover bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between" data-reveal data-delay="3">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <h4 class="font-serif font-bold text-lg text-clinic-dark">Bioestimulador de Colágeno</h4>
@@ -197,11 +317,11 @@
 
             <!-- Categoria 2: Saúde Injetável, Vitaminas & Emagrecimento -->
             <div class="mb-14">
-                <h3 class="text-2xl font-serif font-bold text-clinic-gold mb-6 border-b border-clinic-gold/20 pb-2 flex items-center gap-2">
+                <h3 class="text-2xl font-serif font-bold text-clinic-gold mb-6 border-b border-clinic-gold/20 pb-2 flex items-center gap-2" data-reveal="left">
                     <i class="fas fa-syringe text-lg"></i> Saúde Injetável, Vitaminas & Emagrecimento
                 </h3>
                 <div class="grid md:grid-cols-3 gap-6">
-                    <div class="bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 hover:shadow-lg transition-all flex flex-col justify-between">
+                    <div class="card-hover bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between" data-reveal data-delay="1">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <h4 class="font-serif font-bold text-lg text-clinic-dark">BCAA Injetável</h4>
@@ -216,7 +336,7 @@
                         </a>
                     </div>
 
-                    <div class="bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 hover:shadow-lg transition-all flex flex-col justify-between">
+                    <div class="card-hover bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between" data-reveal data-delay="2">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <h4 class="font-serif font-bold text-lg text-clinic-dark">Vitamina B12 Injetável</h4>
@@ -231,7 +351,7 @@
                         </a>
                     </div>
 
-                    <div class="bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 hover:shadow-lg transition-all flex flex-col justify-between">
+                    <div class="card-hover bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between" data-reveal data-delay="3">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <h4 class="font-serif font-bold text-lg text-clinic-dark">Vitamina ADEK Injetável</h4>
@@ -246,7 +366,7 @@
                         </a>
                     </div>
 
-                    <div class="bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 hover:shadow-lg transition-all flex flex-col justify-between">
+                    <div class="card-hover bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between" data-reveal data-delay="1">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <h4 class="font-serif font-bold text-lg text-clinic-dark">Doses Emagrecedoras</h4>
@@ -261,7 +381,7 @@
                         </a>
                     </div>
 
-                    <div class="bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 hover:shadow-lg transition-all flex flex-col justify-between">
+                    <div class="card-hover bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between" data-reveal data-delay="2">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <h4 class="font-serif font-bold text-lg text-clinic-dark">Reposição de Coenzima Q10</h4>
@@ -276,7 +396,7 @@
                         </a>
                     </div>
 
-                    <div class="bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 hover:shadow-lg transition-all flex flex-col justify-between">
+                    <div class="card-hover bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between" data-reveal data-delay="3">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <h4 class="font-serif font-bold text-lg text-clinic-dark">Vitamina Complexo B Plus</h4>
@@ -295,11 +415,11 @@
 
             <!-- Categoria 3: Estética Corporal & Depilação a Laser -->
             <div>
-                <h3 class="text-2xl font-serif font-bold text-clinic-gold mb-6 border-b border-clinic-gold/20 pb-2 flex items-center gap-2">
+                <h3 class="text-2xl font-serif font-bold text-clinic-gold mb-6 border-b border-clinic-gold/20 pb-2 flex items-center gap-2" data-reveal="left">
                     <i class="fas fa-wand-magic-sparkles text-lg"></i> Estética Corporal & Depilação a Laser
                 </h3>
                 <div class="grid md:grid-cols-4 gap-6">
-                    <div class="bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 hover:shadow-lg transition-all flex flex-col justify-between">
+                    <div class="card-hover bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between" data-reveal data-delay="1">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <h4 class="font-serif font-bold text-base text-clinic-dark">Retirada de Vasinhos</h4>
@@ -314,7 +434,7 @@
                         </a>
                     </div>
 
-                    <div class="bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 hover:shadow-lg transition-all flex flex-col justify-between">
+                    <div class="card-hover bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between" data-reveal data-delay="2">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <h4 class="font-serif font-bold text-base text-clinic-dark">Laser - Axilas</h4>
@@ -329,7 +449,7 @@
                         </a>
                     </div>
 
-                    <div class="bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 hover:shadow-lg transition-all flex flex-col justify-between">
+                    <div class="card-hover bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between" data-reveal data-delay="3">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <h4 class="font-serif font-bold text-base text-clinic-dark">Laser - Virilha Completa</h4>
@@ -344,7 +464,7 @@
                         </a>
                     </div>
 
-                    <div class="bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 hover:shadow-lg transition-all flex flex-col justify-between">
+                    <div class="card-hover bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between" data-reveal data-delay="4">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <h4 class="font-serif font-bold text-base text-clinic-dark">Laser - Combo Promocional</h4>
@@ -367,7 +487,7 @@
     <section id="localizacao" class="py-16 bg-white border-t border-clinic-gold/10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-clinic-sand p-8 sm:p-12 rounded-3xl border border-clinic-gold/20 shadow-sm grid md:grid-cols-2 gap-8 items-center">
-                <div>
+                <div data-reveal="left">
                     <span class="text-xs font-semibold uppercase tracking-widest text-clinic-gold">Atendimento Presencial</span>
                     <h2 class="text-3xl font-serif font-bold text-clinic-dark mt-2 mb-4">Onde Estamos</h2>
                     <p class="text-gray-600 text-sm leading-relaxed mb-6">
@@ -388,16 +508,16 @@
                         </p>
                     </div>
                     <div class="flex flex-wrap gap-4">
-                        <a href="https://maps.google.com/?q=Clinica+de+Estetica+Dra+Cintya+Freitas+Estreito+MA" target="_blank" class="bg-clinic-gold hover:bg-clinic-goldHover text-white px-6 py-3 rounded-full text-xs font-semibold flex items-center gap-2 transition-all shadow-md">
+                        <a href="https://maps.google.com/?q=Clinica+de+Estetica+Dra+Cintya+Freitas+Estreito+MA" target="_blank" class="btn-shine bg-clinic-gold hover:bg-clinic-goldHover text-white px-6 py-3 rounded-full text-xs font-semibold flex items-center gap-2 transition-all shadow-md hover:scale-105">
                             <i class="fas fa-location-arrow"></i> Abrir no Google Maps
                         </a>
-                        <a href="https://wa.me/9984358685?text=Olá!%20Pode%20me%20enviar%20a%20localização%20exata%20da%20clínica?" target="_blank" class="border border-clinic-gold text-clinic-dark hover:bg-clinic-gold/10 px-6 py-3 rounded-full text-xs font-semibold flex items-center gap-2 transition-all">
+                        <a href="https://wa.me/9984358685?text=Olá!%20Pode%20me%20enviar%20a%20localização%20exata%20da%20clínica?" target="_blank" class="border border-clinic-gold text-clinic-dark hover:bg-clinic-gold/10 px-6 py-3 rounded-full text-xs font-semibold flex items-center gap-2 transition-all hover:scale-105">
                             <i class="fab fa-whatsapp text-green-600"></i> Pedir Localização no WhatsApp
                         </a>
                     </div>
                 </div>
-                <div class="rounded-2xl overflow-hidden border-2 border-clinic-gold/20 shadow-md h-64 sm:h-80 relative">
-                    <img src="hero.jpg" alt="Localização da Clínica Dra. Cintya Freitas" class="w-full h-full object-cover">
+                <div class="rounded-2xl overflow-hidden border-2 border-clinic-gold/20 shadow-md h-64 sm:h-80 relative group" data-reveal="right">
+                    <img src="hero.jpg" alt="Localização da Clínica Dra. Cintya Freitas" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
                         <span class="text-white text-xs font-medium bg-clinic-gold/90 px-3 py-1.5 rounded-full backdrop-blur-md">
                             📍 Clínica Dra. Cintya Freitas • Estreito - MA
@@ -411,24 +531,24 @@
     <!-- Galeria de Fotos do Espaço -->
     <section id="galeria" class="py-20 bg-clinic-sand">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-12">
+            <div class="text-center max-w-2xl mx-auto mb-12" data-reveal>
                 <span class="text-xs font-semibold uppercase tracking-widest text-clinic-gold">Estrutura</span>
                 <h2 class="text-3xl sm:text-4xl font-serif font-bold text-clinic-dark mt-2">Conheça Nosso Espaço</h2>
                 <p class="text-gray-600 mt-2">Ambiente moderno, acolhedor e preparado para proporcionar o seu bem-estar.</p>
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="rounded-xl overflow-hidden shadow-md aspect-square">
-                    <img src="espaco1.jpg" alt="Consultório" class="w-full h-full object-cover hover:scale-105 transition-all duration-300">
+                <div class="rounded-xl overflow-hidden shadow-md aspect-square" data-reveal="zoom" data-delay="1">
+                    <img src="espaco1.jpg" alt="Consultório" class="w-full h-full object-cover hover:scale-110 transition-all duration-500">
                 </div>
-                <div class="rounded-xl overflow-hidden shadow-md aspect-square">
-                    <img src="espaco2.jpg" alt="Sala de Atendimento" class="w-full h-full object-cover hover:scale-105 transition-all duration-300">
+                <div class="rounded-xl overflow-hidden shadow-md aspect-square" data-reveal="zoom" data-delay="2">
+                    <img src="espaco2.jpg" alt="Sala de Atendimento" class="w-full h-full object-cover hover:scale-110 transition-all duration-500">
                 </div>
-                <div class="rounded-xl overflow-hidden shadow-md aspect-square">
-                    <img src="espaco3.jpg" alt="Atendimento Clínico" class="w-full h-full object-cover hover:scale-105 transition-all duration-300">
+                <div class="rounded-xl overflow-hidden shadow-md aspect-square" data-reveal="zoom" data-delay="3">
+                    <img src="espaco3.jpg" alt="Atendimento Clínico" class="w-full h-full object-cover hover:scale-110 transition-all duration-500">
                 </div>
-                <div class="rounded-xl overflow-hidden shadow-md aspect-square">
-                    <img src="mimos.jpg" alt="Recepção e Mimos" class="w-full h-full object-cover hover:scale-105 transition-all duration-300">
+                <div class="rounded-xl overflow-hidden shadow-md aspect-square" data-reveal="zoom" data-delay="4">
+                    <img src="mimos.jpg" alt="Recepção e Mimos" class="w-full h-full object-cover hover:scale-110 transition-all duration-500">
                 </div>
             </div>
         </div>
@@ -437,8 +557,8 @@
     <!-- Depoimentos de Clientes (No Final da Página) -->
     <section id="avaliacoes" class="py-20 bg-white border-t border-clinic-gold/10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-16">
-                <div class="flex justify-center gap-1 text-yellow-400 text-xl mb-2">
+            <div class="text-center max-w-2xl mx-auto mb-16" data-reveal>
+                <div class="twinkle flex justify-center gap-1 text-yellow-400 text-xl mb-2">
                     <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                 </div>
                 <h2 class="text-3xl sm:text-4xl font-serif font-bold text-clinic-dark">Avaliações das Clientes</h2>
@@ -446,7 +566,7 @@
             </div>
 
             <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <div class="bg-clinic-sand p-8 rounded-2xl border border-clinic-gold/20 relative shadow-sm">
+                <div class="card-hover bg-clinic-sand p-8 rounded-2xl border border-clinic-gold/20 relative shadow-sm" data-reveal="left">
                     <i class="fas fa-quote-left text-clinic-gold/20 text-4xl absolute top-6 right-6"></i>
                     <p class="text-gray-700 italic mb-6 leading-relaxed">
                         "Foi um prazer ser atendida por esta equipe, o atendimento foi bem além das expectativas. Foram muito profissionais!"
@@ -460,7 +580,7 @@
                     </div>
                 </div>
 
-                <div class="bg-clinic-sand p-8 rounded-2xl border border-clinic-gold/20 relative shadow-sm">
+                <div class="card-hover bg-clinic-sand p-8 rounded-2xl border border-clinic-gold/20 relative shadow-sm" data-reveal="right">
                     <i class="fas fa-quote-left text-clinic-gold/20 text-4xl absolute top-6 right-6"></i>
                     <p class="text-gray-700 italic mb-6 leading-relaxed">
                         "Atendimento excelente do começo ao fim😍, recomendo muito! Estou apaixonada nessa clínica!"
@@ -481,14 +601,14 @@
     <footer id="contato" class="bg-clinic-dark text-white pt-16 pb-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid md:grid-cols-3 gap-10 pb-12 border-b border-gray-800">
-                <div>
+                <div data-reveal data-delay="1">
                     <img src="logo.jpg" alt="Dra. Cintya Freitas" class="h-14 w-auto mb-4 bg-white/10 p-2 rounded">
                     <p class="text-gray-400 text-sm leading-relaxed mb-4">
                         Centro de Saúde e Beleza especializado em proporcionar os melhores tratamentos estéticos com excelência e cuidado.
                     </p>
                 </div>
 
-                <div>
+                <div data-reveal data-delay="2">
                     <h4 class="font-bold text-lg mb-4 text-clinic-gold">Horário e Funcionamento</h4>
                     <ul class="space-y-2 text-sm text-gray-300">
                         <li class="flex items-center gap-2"><i class="far fa-clock text-clinic-gold"></i> Segunda a Sexta: Fechamento às 17:00</li>
@@ -496,10 +616,10 @@
                     </ul>
                 </div>
 
-                <div>
+                <div data-reveal data-delay="3">
                     <h4 class="font-bold text-lg mb-4 text-clinic-gold">Agende sua Consulta</h4>
                     <p class="text-sm text-gray-300 mb-4">Entre em contato via WhatsApp para tirar dúvidas e agendar sua avaliação.</p>
-                    <a href="https://wa.me/9984358685" target="_blank" class="inline-flex items-center gap-2 bg-clinic-gold hover:bg-clinic-goldHover text-white px-6 py-3 rounded-full text-sm font-semibold transition-all">
+                    <a href="https://wa.me/9984358685" target="_blank" class="btn-shine inline-flex items-center gap-2 bg-clinic-gold hover:bg-clinic-goldHover text-white px-6 py-3 rounded-full text-sm font-semibold transition-all hover:scale-105">
                         <i class="fab fa-whatsapp"></i> Falar pelo WhatsApp
                     </a>
                 </div>
@@ -510,6 +630,36 @@
             </div>
         </div>
     </footer>
+
+    <!-- Botão WhatsApp Flutuante -->
+    <a href="https://wa.me/9984358685?text=Olá,%20gostaria%20de%20agendar%20uma%20consulta!" target="_blank"
+       class="wa-float fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-lg transition-transform duration-300"
+       aria-label="Fale conosco no WhatsApp">
+        <i class="fab fa-whatsapp text-3xl"></i>
+    </a>
+
+    <script>
+        // ===== SCROLL REVEAL com IntersectionObserver =====
+        const revealEls = document.querySelectorAll('[data-reveal]');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+        revealEls.forEach(el => observer.observe(el));
+
+        // ===== BARRA DE PROGRESSO DE SCROLL =====
+        const progressBar = document.getElementById('scroll-progress');
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+            progressBar.style.width = pct + '%';
+        }, { passive: true });
+    </script>
 
 </body>
 </html>
