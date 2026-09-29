@@ -269,6 +269,120 @@
             opacity: 0;
         }
 
+        /* ===== FOTO RECORTADA DA DRA. (HERO) ===== */
+        .dra-stage {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            min-height: 480px;
+        }
+
+        .dra-photo {
+            position: relative;
+            z-index: 3;
+            max-height: 560px;
+            width: auto;
+            max-width: 92%;
+            object-fit: contain;
+            /* sombra que acompanha a silhueta do recorte */
+            filter: drop-shadow(0 26px 34px rgba(42, 36, 33, 0.32))
+                    drop-shadow(0 0 55px rgba(179, 146, 104, 0.38));
+            animation: draFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes draFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .dra-glow {
+            position: absolute;
+            inset: 8% 2% 0;
+            z-index: 1;
+            background: radial-gradient(ellipse at 50% 62%,
+                rgba(212, 184, 140, 0.55) 0%,
+                rgba(179, 146, 104, 0.22) 52%,
+                transparent 74%);
+            filter: blur(12px);
+            animation: auraPulse 5s ease-in-out infinite;
+        }
+
+        .dra-arch {
+            position: absolute;
+            z-index: 1;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(76%, 330px);
+            height: 90%;
+            background: linear-gradient(180deg,
+                rgba(233, 214, 178, 0.9) 0%,
+                rgba(212, 184, 140, 0.55) 55%,
+                rgba(179, 146, 104, 0.32) 100%);
+            border-radius: 999px 999px 30px 30px;
+            box-shadow: inset 0 0 70px rgba(255, 255, 255, 0.55),
+                        0 24px 55px rgba(179, 146, 104, 0.28);
+        }
+
+        .dra-arch-ring {
+            background: transparent;
+            border: 2px solid rgba(179, 146, 104, 0.45);
+            width: calc(min(76%, 330px) + 30px);
+            height: calc(90% + 16px);
+            bottom: calc(5% - 8px);
+            box-shadow: none;
+        }
+
+        .dra-floor {
+            position: absolute;
+            z-index: 2;
+            bottom: 1%;
+            left: 50%;
+            width: 64%;
+            height: 36px;
+            background: radial-gradient(ellipse at center, rgba(42, 36, 33, 0.38), transparent 70%);
+            filter: blur(7px);
+            animation: draFloor 6s ease-in-out infinite;
+        }
+
+        @keyframes draFloor {
+            0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.85; }
+            50% { transform: translateX(-50%) scaleX(0.84); opacity: 0.55; }
+        }
+
+        .dra-card {
+            position: absolute;
+            z-index: 4;
+            bottom: 7%;
+            left: 0;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(179, 146, 104, 0.35);
+            border-radius: 16px;
+            padding: 10px 16px;
+            box-shadow: 0 14px 32px rgba(42, 36, 33, 0.16);
+            animation: fadeInUp 1s 1.1s forwards;
+            opacity: 0;
+        }
+
+        .dra-star {
+            position: absolute;
+            z-index: 2;
+            color: #C6A87C;
+            pointer-events: none;
+            animation: sparkle 3s ease-in-out infinite;
+        }
+
+        @media (max-width: 640px) {
+            .dra-stage { min-height: 400px; }
+            .dra-photo { max-height: 400px; }
+            .dra-arch { width: min(84%, 280px); }
+            .dra-arch-ring { width: calc(min(84%, 280px) + 24px); }
+            .dra-card { padding: 8px 12px; border-radius: 14px; }
+        }
+
         /* ===== TESTIMONIAL CARDS ===== */
         .testimonial-card {
             transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -343,316 +457,10 @@
             pointer-events: none;
         }
 
-        /* ===== DNA FLUTUANTE ===== */
-        .floating-dna {
-            position: fixed;
-            top: 0;
-            left: 0;
-            /* posição inicial (o JavaScript assume o controle logo em seguida) */
-            transform: translate3d(calc(50vw - 35px), calc(50vh - 70px), 0);
-            will-change: transform;
-            width: 70px;
-            height: 140px;
-            z-index: 60;
-            cursor: grab;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: none; /* impede o scroll da página enquanto arrasta o DNA */
-            transition: opacity 0.5s ease, filter 0.5s ease;
-            opacity: 0.8;
-            pointer-events: auto;
-            filter: drop-shadow(0 0 14px rgba(179, 146, 104, 0.45));
-        }
-
-        /* Área de toque ampliada (mais fácil de agarrar com o dedo) */
-        .floating-dna::before {
-            content: '';
-            position: absolute;
-            inset: -18px;
-            border-radius: 50%;
-        }
-
-        .floating-dna img,
-        .floating-dna svg {
-            pointer-events: none;
-            -webkit-user-drag: none;
-        }
-
-        .floating-dna:hover {
-            opacity: 1;
-            filter: drop-shadow(0 0 30px rgba(179, 146, 104, 0.8));
-        }
-
-        .floating-dna.dragging {
-            cursor: grabbing;
-            opacity: 1;
-            filter: drop-shadow(0 0 40px rgba(179, 146, 104, 1));
-        }
-
-        .floating-dna.dragging .dna-container {
-            animation-play-state: paused;
-        }
-
-        .dna-aura {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 120%; height: 120%;
-            transform: translate(-50%, -50%);
-            background: radial-gradient(circle, rgba(179, 146, 104, 0.25), transparent 70%);
-            border-radius: 50%;
-            animation: auraPulse 3s ease-in-out infinite;
-            pointer-events: none;
-        }
-
+        /* (DNA flutuante removido — keyframe mantido pois o brilho da foto da Dra. usa auraPulse) */
         @keyframes auraPulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
-            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
-        }
-
-        /* --- Dupla hélice 3D real --- */
-        .floating-dna {
-            --s: 1;                                   /* escala geral */
-            --span: calc(50px * var(--s));            /* largura da hélice */
-            --gap: calc(10.5px * var(--s));           /* distância entre os degraus */
-            --dot: calc(9px * var(--s));              /* tamanho das esferas */
-            --speed: 3.4s;                            /* velocidade do giro */
-            --step: -0.24s;                           /* defasagem entre degraus */
-        }
-        @media (max-width: 768px) { .floating-dna { --s: 0.84; } }
-        @media (max-width: 480px) { .floating-dna { --s: 0.76; } }
-
-        .dna-container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            perspective: 520px;
-            transform-style: preserve-3d;
-            animation: dnaFloat 6s ease-in-out infinite;
-        }
-
-        @keyframes dnaFloat {
-            0%, 100% { transform: translateY(-6px); }
-            50% { transform: translateY(6px); }
-        }
-
-        /* Brilho central que dá volume à hélice */
-        .dna-core {
-            position: absolute;
-            left: 50%; top: 6%;
-            width: calc(3px * var(--s));
-            height: 88%;
-            margin-left: calc(-1.5px * var(--s));
-            border-radius: 99px;
-            background: linear-gradient(180deg, transparent, rgba(232, 212, 176, 0.75), rgba(179, 146, 104, 0.5), transparent);
-            filter: blur(calc(2.5px * var(--s)));
-            opacity: 0.55;
-            animation: corePulse 3s ease-in-out infinite;
-        }
-
-        @keyframes corePulse {
-            0%, 100% { opacity: 0.35; }
-            50% { opacity: 0.75; }
-        }
-
-        .dna-helix {
-            position: absolute;
-            left: 50%; top: 50%;
-            width: 0; height: 0;
-            transform-style: preserve-3d;
-            transform: rotateX(-8deg) rotateZ(-1.5deg);
-        }
-
-        /* Cada "degrau" gira em torno do eixo vertical -> forma a hélice */
-        .dna-rung {
-            position: absolute;
-            left: 0;
-            top: calc((var(--i) - 6) * var(--gap));
-            width: var(--span);
-            height: 0;
-            margin-left: calc(var(--span) / -2);
-            transform-style: preserve-3d;
-            animation: helixTurn var(--speed) linear infinite;
-            animation-delay: calc(var(--i) * var(--step));
-        }
-
-        @keyframes helixTurn {
-            from { transform: rotateY(0deg); }
-            to   { transform: rotateY(360deg); }
-        }
-
-        /* Ponte entre as duas fitas (par de bases) */
-        .dna-bar {
-            position: absolute;
-            left: 0; top: 0;
-            width: 100%;
-            height: calc(2.2px * var(--s));
-            margin-top: calc(-1.1px * var(--s));
-            border-radius: 99px;
-            background: linear-gradient(90deg,
-                rgba(179, 146, 104, 0.15),
-                rgba(244, 228, 198, 0.95) 35%,
-                rgba(212, 184, 140, 0.95) 65%,
-                rgba(179, 146, 104, 0.15));
-            box-shadow: 0 0 calc(4px * var(--s)) rgba(212, 184, 140, 0.55);
-            animation: barFade var(--speed) linear infinite;
-            animation-delay: calc(var(--i) * var(--step));
-        }
-
-        @keyframes barFade {
-            0%, 50%, 100% { opacity: 0.95; }
-            25%, 75%      { opacity: 0.18; }
-        }
-
-        /* Esferas das fitas (com luz, sombra e profundidade) */
-        .dna-node {
-            position: absolute;
-            top: 0;
-            width: var(--dot);
-            height: var(--dot);
-            margin-top: calc(var(--dot) / -2);
-            margin-left: calc(var(--dot) / -2);
-            border-radius: 50%;
-            animation: nodeDepth var(--speed) linear infinite;
-        }
-
-        .dna-node.a {
-            left: 0;
-            background: radial-gradient(circle at 32% 28%, #FFFaF0 0%, #EBD4AC 38%, #B89164 72%, #8A6838 100%);
-            box-shadow: 0 0 calc(7px * var(--s)) rgba(232, 212, 176, 0.9);
-            animation-delay: calc(var(--i) * var(--step));
-        }
-
-        .dna-node.b {
-            left: 100%;
-            background: radial-gradient(circle at 32% 28%, #FFF3DD 0%, #D9B98A 38%, #A17C4C 72%, #6F5228 100%);
-            box-shadow: 0 0 calc(7px * var(--s)) rgba(196, 162, 112, 0.85);
-            /* meia volta de defasagem: fica sempre do lado oposto */
-            animation-delay: calc(var(--i) * var(--step) - (var(--speed) / 2));
-        }
-
-        /* Frente = maior e mais clara | Fundo = menor e mais escura */
-        @keyframes nodeDepth {
-            0%   { transform: scale(1);    filter: brightness(1);    opacity: 0.9; }
-            25%  { transform: scale(1.28); filter: brightness(1.35); opacity: 1; }
-            50%  { transform: scale(1);    filter: brightness(1);    opacity: 0.9; }
-            75%  { transform: scale(0.68); filter: brightness(0.5);  opacity: 0.5; }
-            100% { transform: scale(1);    filter: brightness(1);    opacity: 0.9; }
-        }
-
-        .dna-sparkle {
-            position: absolute;
-            color: #D4B88C;
-            font-size: 10px;
-            animation: sparkle 2.5s ease-in-out infinite;
-            pointer-events: none;
-        }
-
-        /* Responsividade do DNA */
-        @media (max-width: 768px) {
-            .floating-dna {
-                width: 58px;
-                height: 116px;
-                opacity: 0.8;
-                filter: drop-shadow(0 0 12px rgba(179, 146, 104, 0.6));
-            }
-        }
-
-        @media (max-width: 480px) {
-            .floating-dna {
-                width: 52px;
-                height: 104px;
-            }
-        }
-
-        /* Dispositivos de toque: sem "hover" preso após tocar */
-        @media (hover: none) {
-            .floating-dna { opacity: 0.8; }
-            .floating-dna:hover { opacity: 0.8; filter: drop-shadow(0 0 12px rgba(179, 146, 104, 0.6)); }
-            .floating-dna.dragging,
-            .floating-dna.dragging:hover {
-                opacity: 1;
-                filter: drop-shadow(0 0 22px rgba(179, 146, 104, 1));
-            }
-            .floating-dna:hover:not(.show-hint) .dna-hint { opacity: 0; }
-        }
-
-        /* Animação para chamar atenção (celular) */
-        .floating-dna.attention .dna-aura {
-            animation: auraAttention 1.1s ease-in-out 4;
-        }
-        @keyframes auraAttention {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
-            50% { transform: translate(-50%, -50%) scale(2.4); opacity: 1; }
-        }
-
-        /* Efeito ao tocar (pop) */
-        .floating-dna.pop .dna-aura {
-            animation: auraBurst 0.6s ease-out;
-        }
-        @keyframes auraBurst {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
-        }
-
-        /* Anel de arraste ativo */
-        .floating-dna.dragging .dna-aura {
-            animation: none;
-            transform: translate(-50%, -50%) scale(1.8);
-            opacity: 1;
-            transition: transform 0.25s ease;
-        }
-
-        /* Dica de arrastar */
-        .dna-hint {
-            position: absolute;
-            top: calc(100% + 8px);
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(42, 36, 33, 0.95);
-            color: #D4B88C;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-            font-weight: 500;
-            border: 1px solid rgba(179, 146, 104, 0.3);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-
-        .dna-hint::before {
-            content: '';
-            position: absolute;
-            top: -4px; left: 50%;
-            transform: translateX(-50%) rotate(45deg);
-            width: 8px; height: 8px;
-            background: rgba(42, 36, 33, 0.95);
-            border-left: 1px solid rgba(179, 146, 104, 0.3);
-            border-top: 1px solid rgba(179, 146, 104, 0.3);
-        }
-
-        .floating-dna:hover .dna-hint,
-        .floating-dna.show-hint .dna-hint {
-            opacity: 1;
-        }
-
-        .floating-dna.dragging .dna-hint {
-            opacity: 0 !important;
-        }
-
-        /* Quando o DNA está na metade de baixo da tela, a dica aparece acima */
-        .floating-dna.hint-above .dna-hint {
-            top: auto;
-            bottom: calc(100% + 8px);
-        }
-        .floating-dna.hint-above .dna-hint::before {
-            top: auto;
-            bottom: -4px;
-            transform: translateX(-50%) rotate(225deg);
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.55; }
+            50% { transform: translate(-50%, -50%) scale(1.14); opacity: 1; }
         }
 
         /* ===== ANIMAÇÕES ESPECÍFICAS PARA MOBILE ===== */
@@ -952,27 +760,54 @@
                     </div>
                 </div>
 
-                <!-- Foto Principal -->
+                <!-- Foto da Dra. Cintya (recorte sem fundo) -->
                 <div class="relative hero-img-enter">
-                    <div class="aspect-[4/3] sm:aspect-[16/10] rounded-2xl shadow-2xl overflow-hidden border-4 border-white relative group">
-                        <img src="hero.jpg" alt="Recepção Clínica Dra. Cintya Freitas" class="object-cover w-full h-full transition-transform duration-[1.5s] group-hover:scale-110">
-                        
-                        <!-- Marcador -->
-                        <div class="location-badge absolute bottom-3 right-3 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 text-white text-xs flex items-center gap-1.5 shadow-md z-10">
-                            <i class="fas fa-map-marker-alt text-clinic-gold text-xs" style="animation: bounceSubtle 1.5s infinite;"></i>
-                            <span class="font-medium tracking-wide">Estreito - MA</span>
+                    <!-- Composição do recorte -->
+                    <div id="draCutout" class="dra-stage">
+                        <!-- Brilho de fundo -->
+                        <div class="dra-glow"></div>
+                        <!-- Arco decorativo dourado -->
+                        <div class="dra-arch"></div>
+                        <div class="dra-arch dra-arch-ring"></div>
+
+                        <!-- Sparkles -->
+                        <i class="fas fa-sparkles dra-star" style="top: 12%; left: 8%; font-size: 14px;"></i>
+                        <i class="fas fa-sparkles dra-star" style="top: 28%; right: 6%; font-size: 11px; animation-delay: 1s;"></i>
+                        <i class="fas fa-star dra-star" style="bottom: 30%; left: 4%; font-size: 9px; animation-delay: 2s;"></i>
+                        <i class="fas fa-star dra-star" style="top: 6%; right: 22%; font-size: 9px; animation-delay: 0.5s;"></i>
+
+                        <!-- Foto recortada (PNG sem fundo) -->
+                        <img id="draPhoto" src="dra-cintya.png" alt="Dra. Cintya Freitas"
+                             class="dra-photo"
+                             onerror="document.getElementById('draCutout').style.display='none';document.getElementById('heroFallback').classList.remove('hidden');">
+
+                        <!-- Sombra no chão -->
+                        <div class="dra-floor"></div>
+
+                        <!-- Plaquinha com nome -->
+                        <div class="dra-card">
+                            <p class="font-serif font-bold text-clinic-dark text-sm sm:text-base leading-tight">Dra. Cintya Freitas</p>
+                            <p class="text-clinic-gold text-[11px] sm:text-xs font-semibold flex items-center gap-1 mt-0.5">
+                                <i class="fas fa-map-marker-alt text-[10px]"></i> Estreito - MA
+                            </p>
                         </div>
 
-                        <!-- Overlay dourado ao hover -->
-                        <div class="absolute inset-0 bg-gradient-to-tr from-clinic-gold/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                        <!-- Selo flutuante -->
+                        <div class="absolute top-4 right-2 sm:top-8 sm:right-4 bg-white rounded-full p-2.5 sm:p-3 shadow-xl floating z-[5]">
+                            <i class="fas fa-heart text-clinic-gold text-base sm:text-xl"></i>
+                        </div>
+                        <div class="absolute top-[38%] left-0 sm:left-2 bg-clinic-gold text-white rounded-full p-2.5 sm:p-3 shadow-xl floating-slow z-[5]">
+                            <i class="fas fa-award text-base sm:text-xl"></i>
+                        </div>
                     </div>
 
-                    <!-- Elemento decorativo flutuante -->
-                    <div class="absolute -top-4 -right-4 bg-white rounded-full p-3 shadow-xl floating hidden sm:block">
-                        <i class="fas fa-heart text-clinic-gold text-xl"></i>
-                    </div>
-                    <div class="absolute -bottom-4 -left-4 bg-clinic-gold text-white rounded-full p-3 shadow-xl floating-slow hidden sm:block">
-                        <i class="fas fa-award text-xl"></i>
+                    <!-- Reserva: foto da recepção (só aparece se dra-cintya.png não for encontrada) -->
+                    <div id="heroFallback" class="hidden aspect-[4/3] sm:aspect-[16/10] rounded-2xl shadow-2xl overflow-hidden border-4 border-white relative group">
+                        <img src="hero.jpg" alt="Recepção Clínica Dra. Cintya Freitas" class="object-cover w-full h-full transition-transform duration-[1.5s] group-hover:scale-110">
+                        <div class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 text-white text-xs flex items-center gap-1.5 shadow-md z-10">
+                            <i class="fas fa-map-marker-alt text-clinic-gold text-xs"></i>
+                            <span class="font-medium tracking-wide">Estreito - MA</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1422,41 +1257,6 @@
         <i class="fas fa-arrow-up"></i>
     </button>
 
-    <!-- DNA FLUTUANTE ARRASTÁVEL -->
-    <div id="floatingDNA" class="floating-dna" title="Arraste-me! 🧬">
-        <!-- Aura de brilho -->
-        <div class="dna-aura"></div>
-        
-        <!-- Container do DNA (dupla hélice 3D) -->
-        <div class="dna-container">
-            <div class="dna-core"></div>
-            <div class="dna-helix">
-                <div class="dna-rung" style="--i:0"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
-                <div class="dna-rung" style="--i:1"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
-                <div class="dna-rung" style="--i:2"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
-                <div class="dna-rung" style="--i:3"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
-                <div class="dna-rung" style="--i:4"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
-                <div class="dna-rung" style="--i:5"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
-                <div class="dna-rung" style="--i:6"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
-                <div class="dna-rung" style="--i:7"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
-                <div class="dna-rung" style="--i:8"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
-                <div class="dna-rung" style="--i:9"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
-                <div class="dna-rung" style="--i:10"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
-                <div class="dna-rung" style="--i:11"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
-                <div class="dna-rung" style="--i:12"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
-            </div>
-        </div>
-
-        <!-- Sparkles ao redor do DNA -->
-        <i class="fas fa-sparkles dna-sparkle" style="top: 10%; left: -5%;"></i>
-        <i class="fas fa-sparkles dna-sparkle" style="top: 50%; right: -10%; animation-delay: 1s;"></i>
-        <i class="fas fa-sparkles dna-sparkle" style="bottom: 10%; left: -8%; animation-delay: 2s;"></i>
-        <i class="fas fa-star dna-sparkle" style="top: 30%; right: -5%; animation-delay: 0.5s; font-size: 8px;"></i>
-
-        <!-- Dica de arrastar -->
-        <div class="dna-hint">Arraste-me 🧬</div>
-    </div>
-
     <script>
         // ===== PRELOADER =====
         window.addEventListener('load', () => {
@@ -1713,242 +1513,539 @@
             });
         });
 
-        // ===== DNA FLUTUANTE ARRASTÁVEL (mouse + toque + caneta) =====
-        // Usa Pointer Events: um único código que funciona em PC e celular.
+        // ===== DNA FLUTUANTE REMOVIDO (bloco abaixo desativado) =====
+        if (false) {
         const dna = document.getElementById('floatingDNA');
-        const dnaHint = dna.querySelector('.dna-hint');
-        const dnaIsTouch = window.matchMedia('(pointer: coarse)').matches || isTouchDevice;
+        const dnaCanvas = document.getElementById('dnaCanvas');
+        const dctx = dnaCanvas ? dnaCanvas.getContext('2d') : null;
+        const prefersCalm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        if (dnaIsTouch && dnaHint) dnaHint.textContent = 'Toque e arraste 🧬';
-
-        const dnaState = {
-            x: 0, y: 0,               // centro do DNA (coordenadas da tela)
-            vx: 0, vy: 0,             // velocidade (px por frame a 60fps)
-            dragging: false,
-            pointerId: null,
-            offX: 0, offY: 0,         // distância entre o dedo e o centro do DNA
-            lastX: 0, lastY: 0, lastT: 0,
-            downX: 0, downY: 0, downT: 0,
-            moved: false,
-            lastTap: 0,
-            returning: false,         // animação de volta ao centro
-            resumeAt: 0,              // quando o movimento automático volta
-            wanderAngle: Math.random() * Math.PI * 2,
-            wanderSpeed: dnaIsTouch ? 0.32 : 0.4
+        const dnaRender = {
+            w: 0, h: 0,
+            t: Math.random() * Math.PI * 2,
+            baseSpin: prefersCalm ? 0.22 : 0.95,
+            fastSpin: prefersCalm ? 0.7 : 3.2,
+            spin: prefersCalm ? 0.22 : 0.95,
+            spinTarget: prefersCalm ? 0.22 : 0.95,
+            motes: [],
+            last: 0,
+            ready: false
         };
 
-        function dnaViewport() {
-            return {
-                w: document.documentElement.clientWidth || window.innerWidth,
-                h: window.innerHeight
-            };
+        function sizeDNACanvas() {
+            if (!dnaCanvas || !dctx) return;
+            const w = dna.offsetWidth || 124;
+            const h = dna.offsetHeight || 220;
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            dnaCanvas.width = Math.round(w * dpr);
+            dnaCanvas.height = Math.round(h * dpr);
+            dnaCanvas.style.width = w + 'px';
+            dnaCanvas.style.height = h + 'px';
+            dctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            dnaRender.w = w;
+            dnaRender.h = h;
+            dnaRender.ready = true;
         }
 
-        function dnaBounds() {
-            const v = dnaViewport();
-            const hw = dna.offsetWidth / 2;
-            const hh = dna.offsetHeight / 2;
-            return { minX: hw, maxX: Math.max(hw, v.w - hw), minY: hh, maxY: Math.max(hh, v.h - hh) };
+        // Cor da fita conforme a profundidade (z: -1 atrás … +1 na frente)
+        function helixColor(z, alpha) {
+            const t = (z + 1) / 2;
+            const r = Math.round(104 + (247 - 104) * t);
+            const g = Math.round(80 + (232 - 80) * t);
+            const b = Math.round(50 + (201 - 50) * t);
+            return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha.toFixed(3) + ')';
         }
 
-        function clampDNA() {
-            const b = dnaBounds();
-            dnaState.x = Math.min(b.maxX, Math.max(b.minX, dnaState.x));
-            dnaState.y = Math.min(b.maxY, Math.max(b.minY, dnaState.y));
+        function seedMotes() {
+            dnaRender.motes = [];
+            const count = dnaRender.w < 110 ? 12 : 18;
+            for (let i = 0; i < count; i++) {
+                dnaRender.motes.push({
+                    burst: false,
+                    x: Math.random() * dnaRender.w,
+                    y: Math.random() * dnaRender.h,
+                    vy: 0.18 + Math.random() * 0.4,
+                    vx: 0,
+                    r: 0.5 + Math.random() * 1.2,
+                    life: 0.3 + Math.random() * 0.7,
+                    decay: 0.06 + Math.random() * 0.1,
+                    seed: Math.random() * 6.28,
+                    color: Math.random() > 0.5 ? '#E8D4B0' : '#C6A87C'
+                });
+            }
         }
 
-        // Rebate suavemente nas bordas da tela
-        function bounceDNA() {
-            const b = dnaBounds();
-            const s = dnaState;
-            if (s.x < b.minX)      { s.x = b.minX; s.vx = Math.abs(s.vx) * 0.6;  s.wanderAngle = Math.PI - s.wanderAngle; }
-            else if (s.x > b.maxX) { s.x = b.maxX; s.vx = -Math.abs(s.vx) * 0.6; s.wanderAngle = Math.PI - s.wanderAngle; }
-            if (s.y < b.minY)      { s.y = b.minY; s.vy = Math.abs(s.vy) * 0.6;  s.wanderAngle = -s.wanderAngle; }
-            else if (s.y > b.maxY) { s.y = b.maxY; s.vy = -Math.abs(s.vy) * 0.6; s.wanderAngle = -s.wanderAngle; }
+        function spawnDNABurst(n, power) {
+            if (!dnaRender.ready) return;
+            const cx = dnaRender.w / 2, cy = dnaRender.h / 2;
+            for (let i = 0; i < n; i++) {
+                const a = Math.random() * Math.PI * 2;
+                const sp = (0.6 + Math.random() * 1.8) * power;
+                dnaRender.motes.push({
+                    burst: true,
+                    x: cx + (Math.random() - 0.5) * dnaRender.w * 0.35,
+                    y: cy + (Math.random() - 0.5) * dnaRender.h * 0.5,
+                    vx: Math.cos(a) * sp,
+                    vy: Math.sin(a) * sp - 0.4,
+                    r: 0.7 + Math.random() * 1.6,
+                    life: 1,
+                    decay: 0.9 + Math.random() * 0.7,
+                    seed: a,
+                    color: Math.random() > 0.4 ? '#F2E3C6' : '#B39268'
+                });
+            }
         }
 
-        function renderDNA() {
-            const w = dna.offsetWidth, h = dna.offsetHeight;
-            dna.style.transform = `translate3d(${dnaState.x - w / 2}px, ${dnaState.y - h / 2}px, 0)`;
-            // Dica aparece acima do DNA quando ele está na metade de baixo da tela
-            dna.classList.toggle('hint-above', dnaState.y > dnaViewport().h * 0.55);
+        function drawDNA(now) {
+            requestAnimationFrame(drawDNA);
+            if (!dctx || !dnaRender.ready || document.hidden) return;
+
+            const dt = dnaRender.last ? Math.min(0.05, (now - dnaRender.last) / 1000) : 0.016;
+            dnaRender.last = now;
+
+            dnaRender.spin += (dnaRender.spinTarget - dnaRender.spin) * Math.min(1, dt * 3.5);
+            dnaRender.t += dnaRender.spin * dt;
+
+            const w = dnaRender.w, h = dnaRender.h;
+            dctx.clearRect(0, 0, w, h);
+
+            // ---- poeira dourada ambiente ----
+            for (let i = dnaRender.motes.length - 1; i >= 0; i--) {
+                const m = dnaRender.motes[i];
+                if (m.burst) {
+                    m.x += m.vx * dt * 60;
+                    m.y += m.vy * dt * 60;
+                    m.vy += 0.045;
+                    m.vx *= 0.985;
+                } else {
+                    m.y -= m.vy * dt * 60;
+                    m.x += Math.sin(now / 900 + m.seed) * 0.16;
+                }
+                m.life -= dt * m.decay;
+
+                if (m.burst && m.life <= 0) { dnaRender.motes.splice(i, 1); continue; }
+                if (!m.burst && (m.life <= 0 || m.y < -6)) {
+                    m.y = h + 6;
+                    m.x = Math.random() * w;
+                    m.life = 0.5 + Math.random() * 0.5;
+                }
+
+                dctx.globalAlpha = Math.max(0, Math.min(1, m.life)) * 0.6;
+                dctx.fillStyle = m.color;
+                dctx.beginPath();
+                dctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+                dctx.fill();
+            }
+            dctx.globalAlpha = 1;
+
+            // ---- geometria da dupla hélice ----
+            const cx = w / 2;
+            const padY = h * 0.055;
+            const span = h - padY * 2;
+            const amp = w * 0.265;
+            const turns = 2.05;
+            const N = 44;
+            const pts = [];
+
+            for (let i = 0; i <= N; i++) {
+                const f = i / N;
+                const y = padY + f * span;
+                const a = f * Math.PI * 2 * turns + dnaRender.t;
+                const s = Math.sin(a), c = Math.cos(a);
+                pts.push({ y: y, s: s, c: c, x1: cx + amp * s, x2: cx - amp * s });
+            }
+
+            dctx.lineCap = 'round';
+            dctx.lineJoin = 'round';
+
+            // ---- degraus (pares de bases) atrás das fitas ----
+            for (let i = 0; i < pts.length; i += 2) {
+                const p = pts[i];
+                const open = Math.abs(p.s);
+                if (open < 0.1) continue;
+                const g = dctx.createLinearGradient(p.x1, p.y, p.x2, p.y);
+                g.addColorStop(0, helixColor(p.c, 0.18 + open * 0.5));
+                g.addColorStop(0.5, 'rgba(246, 233, 208, ' + (0.14 + open * 0.42).toFixed(3) + ')');
+                g.addColorStop(1, helixColor(-p.c, 0.18 + open * 0.5));
+                dctx.strokeStyle = g;
+                dctx.lineWidth = 0.9 + open * 1.4;
+                dctx.beginPath();
+                dctx.moveTo(p.x1, p.y);
+                dctx.lineTo(p.x2, p.y);
+                dctx.stroke();
+            }
+
+            // ---- fitas: primeiro as de trás, depois as da frente ----
+            for (let pass = 0; pass < 2; pass++) {
+                const frontPass = pass === 1;
+                for (let side = 0; side < 2; side++) {
+                    for (let i = 0; i < pts.length - 1; i++) {
+                        const p = pts[i], q = pts[i + 1];
+                        const z = side === 0 ? p.c : -p.c;
+                        const zq = side === 0 ? q.c : -q.c;
+                        if ((z >= 0) !== frontPass) continue;
+
+                        const x1 = side === 0 ? p.x1 : p.x2;
+                        const x2 = side === 0 ? q.x1 : q.x2;
+                        const zm = (z + zq) / 2;
+                        const t = (zm + 1) / 2;
+
+                        if (frontPass) {
+                            dctx.shadowColor = 'rgba(232, 210, 168, 0.85)';
+                            dctx.shadowBlur = 8;
+                        } else {
+                            dctx.shadowBlur = 0;
+                        }
+                        dctx.strokeStyle = helixColor(zm, 0.4 + t * 0.6);
+                        dctx.lineWidth = 1.4 + t * 2.5;
+                        dctx.beginPath();
+                        dctx.moveTo(x1, p.y);
+                        dctx.lineTo(x2, q.y);
+                        dctx.stroke();
+                    }
+                }
+            }
+            dctx.shadowBlur = 0;
+
+            // ---- nucleotídeos brilhantes ----
+            for (let i = 0; i < pts.length; i += 4) {
+                const p = pts[i];
+                for (let side = 0; side < 2; side++) {
+                    const z = side === 0 ? p.c : -p.c;
+                    const x = side === 0 ? p.x1 : p.x2;
+                    const t = (z + 1) / 2;
+                    dctx.shadowColor = 'rgba(248, 232, 200, 0.95)';
+                    dctx.shadowBlur = 5 + t * 9;
+                    dctx.fillStyle = helixColor(z, 0.55 + t * 0.45);
+                    dctx.beginPath();
+                    dctx.arc(x, p.y, 1.2 + t * 2.1, 0, Math.PI * 2);
+                    dctx.fill();
+                }
+            }
+            dctx.shadowBlur = 0;
+        }
+
+        const dnaState = {
+            isDragging: false,
+            didMove: false,
+            posX: 0,
+            posY: 0,
+            offsetX: 0,
+            offsetY: 0,
+            velocityX: 0,
+            velocityY: 0,
+            lastX: 0,
+            lastY: 0,
+            lastTime: 0,
+            wanderAngle: Math.random() * Math.PI * 2,
+            wanderSpeed: 0.35,
+            autoMove: true,
+            autoMoveTimer: null,
+            pointerId: null,
+            lastTap: 0
+        };
+
+        function getViewport() {
+            if (window.visualViewport) {
+                return { w: window.visualViewport.width, h: window.visualViewport.height };
+            }
+            return { w: window.innerWidth, h: window.innerHeight };
+        }
+
+        function getDNASize() {
+            return { w: dna.offsetWidth || 80, h: dna.offsetHeight || 150 };
+        }
+
+        function initDNAPosition() {
+            const vp = getViewport();
+            dnaState.posX = vp.w / 2;
+            dnaState.posY = vp.h / 2;
+            updateDNAPosition();
+        }
+
+        function updateDNAPosition() {
+            const vp = getViewport();
+            const size = getDNASize();
+            const minX = size.w / 2 + 8;
+            const minY = size.h / 2 + 8;
+            const maxX = vp.w - size.w / 2 - 8;
+            const maxY = vp.h - size.h / 2 - 8;
+
+            dnaState.posX = Math.max(minX, Math.min(maxX, dnaState.posX));
+            dnaState.posY = Math.max(minY, Math.min(maxY, dnaState.posY));
+
+            dna.style.left = dnaState.posX + 'px';
+            dna.style.top = dnaState.posY + 'px';
+            dna.style.transform = 'translate3d(-50%, -50%, 0)';
+        }
+
+        function autoWander() {
+            if (dnaState.isDragging || !dnaState.autoMove) return;
+
+            dnaState.wanderAngle += (Math.random() - 0.5) * 0.25;
+
+            const newX = dnaState.posX + Math.cos(dnaState.wanderAngle) * dnaState.wanderSpeed;
+            const newY = dnaState.posY + Math.sin(dnaState.wanderAngle) * dnaState.wanderSpeed;
+
+            const vp = getViewport();
+            const size = getDNASize();
+            const marginX = size.w / 2 + 16;
+            const marginY = size.h / 2 + 16;
+
+            if (newX < marginX || newX > vp.w - marginX) {
+                dnaState.wanderAngle = Math.PI - dnaState.wanderAngle;
+            } else {
+                dnaState.posX = newX;
+            }
+
+            if (newY < marginY || newY > vp.h - marginY) {
+                dnaState.wanderAngle = -dnaState.wanderAngle;
+            } else {
+                dnaState.posY = newY;
+            }
+
+            updateDNAPosition();
+            requestAnimationFrame(autoWander);
+        }
+
+        function startDrag(x, y, pointerId) {
+            dnaState.isDragging = true;
+            dnaState.didMove = false;
+            dnaState.autoMove = false;
+            dnaState.pointerId = pointerId;
+            dna.classList.add('dragging');
+            document.body.classList.add('dna-dragging');
+
+            // a hélice acelera enquanto é carregada
+            dnaRender.spinTarget = dnaRender.fastSpin;
+            spawnDNABurst(5, 0.5);
+
+            dnaState.offsetX = dnaState.posX - x;
+            dnaState.offsetY = dnaState.posY - y;
+            dnaState.lastX = x;
+            dnaState.lastY = y;
+            dnaState.lastTime = performance.now();
+            dnaState.velocityX = 0;
+            dnaState.velocityY = 0;
+
+            clearTimeout(dnaState.autoMoveTimer);
+
+            if ('vibrate' in navigator) {
+                try { navigator.vibrate(8); } catch (err) {}
+            }
+        }
+
+        function moveDrag(x, y) {
+            if (!dnaState.isDragging) return;
+
+            const dx = x - dnaState.lastX;
+            const dy = y - dnaState.lastY;
+            if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dnaState.didMove = true;
+
+            dnaState.posX = x + dnaState.offsetX;
+            dnaState.posY = y + dnaState.offsetY;
+
+            const now = performance.now();
+            const dt = Math.max(8, now - dnaState.lastTime);
+            dnaState.velocityX = dx * (16 / dt);
+            dnaState.velocityY = dy * (16 / dt);
+            dnaState.lastX = x;
+            dnaState.lastY = y;
+            dnaState.lastTime = now;
+
+            updateDNAPosition();
+        }
+
+        function endDrag() {
+            if (!dnaState.isDragging) return;
+            dnaState.isDragging = false;
+            dnaState.pointerId = null;
+            dna.classList.remove('dragging');
+            document.body.classList.remove('dna-dragging');
+
+            // solta com um sopro de partículas e volta ao giro normal
+            dnaRender.spinTarget = dnaRender.baseSpin;
+            spawnDNABurst(16, 1.6);
+
+            applyInertia();
+
+            dnaState.autoMoveTimer = setTimeout(() => {
+                dnaState.autoMove = true;
+                autoWander();
+            }, 2500);
+        }
+
+        function applyInertia() {
+            const friction = 0.9;
+            const minVelocity = 0.4;
+
+            function inertiaStep() {
+                if (dnaState.isDragging) return;
+                if (Math.abs(dnaState.velocityX) < minVelocity && Math.abs(dnaState.velocityY) < minVelocity) {
+                    dnaState.velocityX = 0;
+                    dnaState.velocityY = 0;
+                    return;
+                }
+
+                dnaState.posX += dnaState.velocityX;
+                dnaState.posY += dnaState.velocityY;
+
+                const vp = getViewport();
+                const size = getDNASize();
+                const minX = size.w / 2 + 8;
+                const minY = size.h / 2 + 8;
+                const maxX = vp.w - size.w / 2 - 8;
+                const maxY = vp.h - size.h / 2 - 8;
+
+                if (dnaState.posX < minX || dnaState.posX > maxX) dnaState.velocityX *= -0.55;
+                if (dnaState.posY < minY || dnaState.posY > maxY) dnaState.velocityY *= -0.55;
+
+                dnaState.velocityX *= friction;
+                dnaState.velocityY *= friction;
+
+                updateDNAPosition();
+                requestAnimationFrame(inertiaStep);
+            }
+
+            inertiaStep();
         }
 
         function resetDNAToCenter() {
-            const s = dnaState;
-            s.vx = 0; s.vy = 0;
-            s.returning = true;
-            dna.classList.remove('pop');
-            void dna.offsetWidth;
-            dna.classList.add('pop');
-            showToast('🧬 DNA voltou ao centro!');
+            dna.style.transition = 'left 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            const vp = getViewport();
+            dnaState.posX = vp.w / 2;
+            dnaState.posY = vp.h / 2;
+            updateDNAPosition();
+            setTimeout(() => { dna.style.transition = ''; }, 700);
+
+            // giro comemorativo + explosão de partículas
+            dnaRender.spinTarget = dnaRender.fastSpin;
+            spawnDNABurst(22, 1.2);
+            setTimeout(() => { dnaRender.spinTarget = dnaRender.baseSpin; }, 1000);
+            if (typeof showToast === 'function') showToast('🧬 DNA voltou ao centro!');
         }
 
-        // ===== LOOP ÚNICO DE ANIMAÇÃO (inércia, retorno e movimento automático) =====
-        let dnaLastFrame = performance.now();
-        function dnaLoop(now) {
-            const s = dnaState;
-            const dt = Math.min((now - dnaLastFrame) / 16.667, 3); // normaliza para 60fps
-            dnaLastFrame = now;
-
-            if (!s.dragging) {
-                if (s.returning) {
-                    const v = dnaViewport();
-                    const ease = Math.min(0.12 * dt, 1);
-                    s.x += (v.w / 2 - s.x) * ease;
-                    s.y += (v.h / 2 - s.y) * ease;
-                    if (Math.hypot(v.w / 2 - s.x, v.h / 2 - s.y) < 1.5) {
-                        s.returning = false;
-                        s.resumeAt = now + 2000;
-                    }
-                } else if (Math.hypot(s.vx, s.vy) > 0.3) {
-                    // Inércia depois de soltar
-                    s.x += s.vx * dt;
-                    s.y += s.vy * dt;
-                    const friction = Math.pow(0.93, dt);
-                    s.vx *= friction;
-                    s.vy *= friction;
-                    s.resumeAt = Math.max(s.resumeAt, now + 1500);
-                } else {
-                    s.vx = 0; s.vy = 0;
-                    if (now >= s.resumeAt) {
-                        // Passeio automático suave
-                        s.wanderAngle += (Math.random() - 0.5) * 0.3 * dt;
-                        s.x += Math.cos(s.wanderAngle) * s.wanderSpeed * dt;
-                        s.y += Math.sin(s.wanderAngle) * s.wanderSpeed * dt;
-                    }
-                }
-                bounceDNA();
-                renderDNA();
-            }
-            requestAnimationFrame(dnaLoop);
-        }
-
-        // ===== ARRASTAR: mouse, dedo ou caneta =====
-        dna.addEventListener('pointerdown', (e) => {
-            if (e.pointerType === 'mouse' && e.button !== 0) return;
-            if (dnaState.dragging) return; // ignora um segundo dedo
-            e.preventDefault();
-
-            const s = dnaState;
-            s.dragging = true;
-            s.pointerId = e.pointerId;
-            s.returning = false;
-            s.moved = false;
-            s.offX = s.x - e.clientX;
-            s.offY = s.y - e.clientY;
-            s.lastX = s.downX = e.clientX;
-            s.lastY = s.downY = e.clientY;
-            s.lastT = s.downT = performance.now();
-            s.vx = 0; s.vy = 0;
-
-            try { dna.setPointerCapture(e.pointerId); } catch (err) {}
-
-            dna.classList.remove('show-hint', 'attention');
-            dna.classList.add('dragging');
-            if (navigator.vibrate && dnaIsTouch) navigator.vibrate(10);
-        });
-
-        dna.addEventListener('pointermove', (e) => {
-            const s = dnaState;
-            if (!s.dragging || e.pointerId !== s.pointerId) return;
-            e.preventDefault();
-
-            const now = performance.now();
-            const frames = Math.max((now - s.lastT) / 16.667, 0.5);
-
-            s.x = e.clientX + s.offX;
-            s.y = e.clientY + s.offY;
-            clampDNA();
-
-            // Velocidade suavizada (para a inércia ao soltar)
-            s.vx = s.vx * 0.4 + ((e.clientX - s.lastX) / frames) * 0.6;
-            s.vy = s.vy * 0.4 + ((e.clientY - s.lastY) / frames) * 0.6;
-
-            s.lastX = e.clientX;
-            s.lastY = e.clientY;
-            s.lastT = now;
-
-            if (Math.hypot(e.clientX - s.downX, e.clientY - s.downY) > 6) s.moved = true;
-            renderDNA();
-        });
-
-        function endDNADrag(e, cancelled) {
-            const s = dnaState;
-            if (!s.dragging || e.pointerId !== s.pointerId) return;
-
-            s.dragging = false;
-            dna.classList.remove('dragging');
-            try { dna.releasePointerCapture(e.pointerId); } catch (err) {}
-
-            const now = performance.now();
-
-            // Se o dedo parou antes de soltar, não há inércia
-            if (now - s.lastT > 90) { s.vx = 0; s.vy = 0; }
-
-            // Limita a velocidade máxima do arremesso
-            const maxV = 32;
-            const speed = Math.hypot(s.vx, s.vy);
-            if (speed > maxV) { s.vx = s.vx / speed * maxV; s.vy = s.vy / speed * maxV; }
-
-            s.resumeAt = now + 3000; // volta a passear sozinho depois de 3s
-
-            // Toque simples / duplo toque (sem arrastar)
-            if (!cancelled && !s.moved && now - s.downT < 350) {
-                s.vx = 0; s.vy = 0;
-                if (now - s.lastTap < 400) {
-                    s.lastTap = 0;
-                    resetDNAToCenter();      // duplo toque = volta ao centro
-                } else {
-                    s.lastTap = now;
-                    dna.classList.remove('pop');
-                    void dna.offsetWidth;
-                    dna.classList.add('pop'); // toque simples = pulso de brilho
-                }
-            }
-        }
-
-        dna.addEventListener('pointerup', (e) => endDNADrag(e, false));
-        dna.addEventListener('pointercancel', (e) => endDNADrag(e, true));
-
-        // Evita menu de "segurar" e arrastar imagem nativo no celular
         dna.addEventListener('contextmenu', (e) => e.preventDefault());
         dna.addEventListener('dragstart', (e) => e.preventDefault());
 
-        // ===== AJUSTA AO GIRAR O CELULAR / REDIMENSIONAR =====
-        function onDNAResize() {
-            clampDNA();
-            renderDNA();
+        // Pointer Events (iOS 13+, Android, desktop) — captura o dedo mesmo fora do DNA
+        if (window.PointerEvent) {
+            dna.addEventListener('pointerdown', (e) => {
+                if (e.button !== undefined && e.button !== 0) return;
+                e.preventDefault();
+                e.stopPropagation();
+                try { dna.setPointerCapture(e.pointerId); } catch (err) {}
+                startDrag(e.clientX, e.clientY, e.pointerId);
+            }, { passive: false });
+
+            const onPointerMove = (e) => {
+                if (!dnaState.isDragging) return;
+                if (dnaState.pointerId !== null && e.pointerId !== dnaState.pointerId) return;
+                e.preventDefault();
+                moveDrag(e.clientX, e.clientY);
+            };
+
+            dna.addEventListener('pointermove', onPointerMove, { passive: false });
+            document.addEventListener('pointermove', onPointerMove, { passive: false });
+
+            const stopPointer = (e) => {
+                if (!dnaState.isDragging) return;
+                if (dnaState.pointerId !== null && e.pointerId !== dnaState.pointerId) return;
+                endDrag();
+            };
+
+            dna.addEventListener('pointerup', stopPointer);
+            dna.addEventListener('pointercancel', stopPointer);
+            document.addEventListener('pointerup', stopPointer);
+            document.addEventListener('pointercancel', stopPointer);
+            dna.addEventListener('lostpointercapture', () => {
+                if (dnaState.isDragging) endDrag();
+            });
+        } else {
+            // Fallback para navegadores antigos
+            dna.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                startDrag(e.clientX, e.clientY);
+            });
+            document.addEventListener('mousemove', (e) => {
+                if (dnaState.isDragging) moveDrag(e.clientX, e.clientY);
+            });
+            document.addEventListener('mouseup', endDrag);
+
+            dna.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const t = e.touches[0];
+                startDrag(t.clientX, t.clientY);
+            }, { passive: false });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!dnaState.isDragging) return;
+                e.preventDefault();
+                const t = e.touches[0];
+                moveDrag(t.clientX, t.clientY);
+            }, { passive: false });
+
+            document.addEventListener('touchend', endDrag);
+            document.addEventListener('touchcancel', endDrag);
         }
+
+        // Duplo toque / duplo clique volta ao centro
+        dna.addEventListener('pointerup', (e) => {
+            if (dnaState.didMove) return;
+            const now = Date.now();
+            if (now - dnaState.lastTap < 350) {
+                resetDNAToCenter();
+                dnaState.lastTap = 0;
+            } else {
+                dnaState.lastTap = now;
+            }
+        });
+
+        function onDNAResize() {
+            updateDNAPosition();
+            sizeDNACanvas();
+            seedMotes();
+        }
+
         window.addEventListener('resize', onDNAResize);
         window.addEventListener('orientationchange', () => setTimeout(onDNAResize, 250));
-        if (window.visualViewport) window.visualViewport.addEventListener('resize', onDNAResize);
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', onDNAResize);
+        }
 
-        // ===== INICIALIZAÇÃO =====
-        (function initDNA() {
-            const v = dnaViewport();
-            dnaState.x = v.w / 2;
-            dnaState.y = v.h / 2;
-            dnaState.resumeAt = performance.now() + 1200;
-            renderDNA();
-            requestAnimationFrame(dnaLoop);
+        setTimeout(() => {
+            dna.classList.add('show-hint');
+            setTimeout(() => dna.classList.remove('show-hint'), 4000);
+        }, 1800);
 
-            // Dica inicial
-            setTimeout(() => {
-                dna.classList.add('show-hint');
-                setTimeout(() => dna.classList.remove('show-hint'), 3800);
-            }, 2500);
-
-            // No celular, pulsa o brilho para chamar atenção
-            if (dnaIsTouch) {
-                setTimeout(() => {
-                    dna.classList.add('attention');
-                    setTimeout(() => dna.classList.remove('attention'), 4600);
-                }, 3500);
+        function bootDNA() {
+            sizeDNACanvas();
+            seedMotes();
+            initDNAPosition();
+            autoWander();
+            if (!dnaRender.started) {
+                dnaRender.started = true;
+                requestAnimationFrame(drawDNA);
             }
-        })();
+        }
 
+        // Refaz as medidas depois que o preloader some (o layout pode mudar)
+        function rebootDNACanvas() {
+            setTimeout(() => { sizeDNACanvas(); seedMotes(); }, 700);
+        }
 
+        if (document.readyState === 'complete') {
+            setTimeout(bootDNA, 120);
+            rebootDNACanvas();
+        } else {
+            window.addEventListener('load', () => {
+                setTimeout(bootDNA, 120);
+                rebootDNACanvas();
+            });
+        }
+        // Garantia extra: o bootDNA é idempotente (o loop só inicia uma vez)
+        setTimeout(bootDNA, 900);
+        } // fim do bloco do DNA (desativado)
     </script>
 
 </body>
