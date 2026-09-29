@@ -135,6 +135,69 @@
         }
         .nav-link:hover::after { width: 100%; }
 
+        /* ===== GALERIA DE ESTRUTURA (OTIMIZADA P/ CELULAR) ===== */
+        .gal-card {
+            position: relative;
+            transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s ease;
+        }
+        .gal-card img {
+            transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
+        }
+        /* Legenda que sobe */
+        .gal-card .gal-caption {
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            padding: 0.6rem 0.7rem;
+            background: linear-gradient(to top, rgba(42,36,33,0.85), transparent);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex; align-items: center; gap: 0.35rem;
+            transform: translateY(100%);
+            opacity: 0;
+            transition: transform 0.45s ease, opacity 0.45s ease;
+        }
+        /* Brilho passante */
+        .gal-card::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.35) 50%, transparent 70%);
+            transform: translateX(-120%);
+            pointer-events: none;
+        }
+
+        /* Zoom contínuo suave (respiração) só no celular */
+        @keyframes breatheZoom {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+        @keyframes shineSweep {
+            0% { transform: translateX(-120%); }
+            100% { transform: translateX(120%); }
+        }
+
+        /* Desktop: usa hover */
+        @media (hover: hover) and (pointer: fine) {
+            .gal-card:hover { transform: translateY(-6px); box-shadow: 0 18px 36px -12px rgba(179,146,104,0.35); }
+            .gal-card:hover img { transform: scale(1.12); }
+            .gal-card:hover .gal-caption { transform: translateY(0); opacity: 1; }
+            .gal-card:hover::after { animation: shineSweep 0.9s ease; }
+        }
+
+        /* Celular / tela de toque: animação automática ao ficar visível */
+        @media (hover: none), (pointer: coarse), (max-width: 767px) {
+            .gal-card.is-visible img { animation: breatheZoom 5s ease-in-out infinite; }
+            .gal-card.is-visible .gal-caption { transform: translateY(0); opacity: 1; }
+            .gal-card.is-visible::after { animation: shineSweep 1.6s ease 0.3s 1; }
+            /* Feedback ao toque */
+            .gal-card:active { transform: scale(0.97); }
+            .gal-card:active img { animation-play-state: paused; }
+            /* Escalona o início da respiração p/ não ficarem todas iguais */
+            .gal-card:nth-child(2).is-visible img { animation-delay: 1.2s; }
+            .gal-card:nth-child(3).is-visible img { animation-delay: 2.4s; }
+            .gal-card:nth-child(4).is-visible img { animation-delay: 3.6s; }
+        }
+
         /* Respeitar preferências de movimento reduzido */
         @media (prefers-reduced-motion: reduce) {
             *, [data-reveal] { animation: none !important; transition: none !important; opacity: 1 !important; transform: none !important; }
@@ -538,17 +601,21 @@
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="rounded-xl overflow-hidden shadow-md aspect-square" data-reveal="zoom" data-delay="1">
-                    <img src="espaco1.jpg" alt="Consultório" class="w-full h-full object-cover hover:scale-110 transition-all duration-500">
+                <div class="gal-card rounded-xl overflow-hidden shadow-md aspect-square" data-reveal="zoom" data-delay="1">
+                    <img src="espaco1.jpg" alt="Consultório" class="w-full h-full object-cover">
+                    <span class="gal-caption"><i class="fas fa-couch text-clinic-gold"></i> Consultório</span>
                 </div>
-                <div class="rounded-xl overflow-hidden shadow-md aspect-square" data-reveal="zoom" data-delay="2">
-                    <img src="espaco2.jpg" alt="Sala de Atendimento" class="w-full h-full object-cover hover:scale-110 transition-all duration-500">
+                <div class="gal-card rounded-xl overflow-hidden shadow-md aspect-square" data-reveal="zoom" data-delay="2">
+                    <img src="espaco2.jpg" alt="Sala de Atendimento" class="w-full h-full object-cover">
+                    <span class="gal-caption"><i class="fas fa-spa text-clinic-gold"></i> Sala de Atendimento</span>
                 </div>
-                <div class="rounded-xl overflow-hidden shadow-md aspect-square" data-reveal="zoom" data-delay="3">
-                    <img src="espaco3.jpg" alt="Atendimento Clínico" class="w-full h-full object-cover hover:scale-110 transition-all duration-500">
+                <div class="gal-card rounded-xl overflow-hidden shadow-md aspect-square" data-reveal="zoom" data-delay="3">
+                    <img src="espaco3.jpg" alt="Atendimento Clínico" class="w-full h-full object-cover">
+                    <span class="gal-caption"><i class="fas fa-user-md text-clinic-gold"></i> Atendimento Clínico</span>
                 </div>
-                <div class="rounded-xl overflow-hidden shadow-md aspect-square" data-reveal="zoom" data-delay="4">
-                    <img src="mimos.jpg" alt="Recepção e Mimos" class="w-full h-full object-cover hover:scale-110 transition-all duration-500">
+                <div class="gal-card rounded-xl overflow-hidden shadow-md aspect-square" data-reveal="zoom" data-delay="4">
+                    <img src="mimos.jpg" alt="Recepção e Mimos" class="w-full h-full object-cover">
+                    <span class="gal-caption"><i class="fas fa-gift text-clinic-gold"></i> Recepção &amp; Mimos</span>
                 </div>
             </div>
         </div>
