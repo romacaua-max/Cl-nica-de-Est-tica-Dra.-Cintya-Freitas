@@ -198,6 +198,64 @@
             .gal-card:nth-child(4).is-visible img { animation-delay: 3.6s; }
         }
 
+        /* ===== DNA FLUTUANTE ===== */
+        #dna-floater {
+            position: fixed;
+            top: 0; left: 0;
+            width: 60px;
+            height: 120px;
+            z-index: 40;
+            pointer-events: auto;
+            cursor: grab;
+            will-change: transform;
+            filter: drop-shadow(0 6px 14px rgba(179,146,104,0.35));
+            transition: filter 0.3s ease;
+        }
+        #dna-floater:active { cursor: grabbing; }
+        #dna-floater:hover { filter: drop-shadow(0 8px 20px rgba(179,146,104,0.6)); }
+
+        .dna-helix {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            animation: dnaSpin 4s linear infinite;
+        }
+        @keyframes dnaSpin {
+            from { transform: rotateY(0deg); }
+            to   { transform: rotateY(360deg); }
+        }
+        /* Cada "degrau" do DNA */
+        .dna-rung {
+            position: absolute;
+            left: 50%;
+            width: 100%;
+            height: 6px;
+            transform-style: preserve-3d;
+        }
+        .dna-rung .base {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 3px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #B39268, #E7D3B3, #98774F);
+            transform: translateX(-50%) rotateY(var(--rot));
+            transform-origin: center;
+        }
+        /* Bolinhas nas pontas de cada degrau */
+        .dna-node {
+            position: absolute;
+            top: -2px;
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #B39268;
+            box-shadow: 0 0 6px rgba(179,146,104,0.7);
+            transform-style: preserve-3d;
+        }
+        .dna-node.left  { left: 0;  transform: translateZ(0) rotateY(var(--rot)) translateX(-16px); }
+        .dna-node.right { right: 0; transform: translateZ(0) rotateY(var(--rot)) translateX(16px); }
+
         /* Respeitar preferências de movimento reduzido */
         @media (prefers-reduced-motion: reduce) {
             *, [data-reveal] { animation: none !important; transition: none !important; opacity: 1 !important; transform: none !important; }
@@ -705,6 +763,11 @@
         <i class="fab fa-whatsapp text-3xl"></i>
     </a>
 
+    <!-- DNA Flutuante -->
+    <div id="dna-floater" aria-hidden="true">
+        <div class="dna-helix" id="dna-helix"></div>
+    </div>
+
     <script>
         // ===== SCROLL REVEAL com IntersectionObserver =====
         const revealEls = document.querySelectorAll('[data-reveal]');
@@ -726,6 +789,123 @@
             const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
             progressBar.style.width = pct + '%';
         }, { passive: true });
+
+        // ===== DNA FLUTUANTE =====
+        (function () {
+            const dna = document.getElementById('dna-floater');
+            const helix = document.getElementById('dna-helix');
+            if (!dna || !helix) return;
+
+            // Constrói os "degraus" da dupla hélice
+            const RUNGS = 14;
+            for (let i = 0; i < RUNGS; i++) {
+                const rot = i * (360 / RUNGS); // rotação em graus de cada degrau
+                const top = (i / (RUNGS - 1)) * 100; // distribui verticalmente
+                const rung = document.createElement('div');
+                rung.className = 'dna-rung';
+                rung.style.top = top + '%';
+                rung.style.setProperty('--rot', rot + 'deg');
+                rung.innerHTML = `
+                    <div class="base"></div>
+                    <div class="dna-node left"></div>
+                    <div class="dna-node right"></div>
+                `;
+                helix.appendChild(rung);
+            }
+
+            const w = () => dna.offsetWidth;
+            const h = () => dna.offsetHeight;
+
+            // Estado de movimento
+            let x = Math.random() * (window.innerWidth - 80) + 20;
+            let y = Math.random() * (window.innerHeight - 160) + 40;
+            let vx = (Math.random() < 0.5 ? -1 : 1) * (0.6 + Math.random() * 0.7);
+            let vy = (Math.random() < 0.5 ? -1 : 1) * (0.6 + Math.random() * 0.7);
+
+            let dragging = false;
+            let dragOffX = 0, dragOffY = 0;
+            let lastX = 0, lastY = 0, lastT = 0;
+
+            function apply() {
+                dna.style.transform = `translate(${x}px, ${y}px)`;
+            }
+            apply();
+
+            // Animação livre (vai para qualquer lugar, ricocheteando nas bordas)
+            function tick() {
+                if (!dragging) {
+                    x += vx;
+                    y += vy;
+
+                    const maxX = window.innerWidth - w();
+                    const maxY = window.innerHeight - h();
+
+                    if (x <= 0)    { x = 0;    vx = Math.abs(vx); }
+                    if (x >= maxX) { x = maxX; vx = -Math.abs(vx); }
+                    if (y <= 0)    { y = 0;    vy = Math.abs(vy); }
+                    if (y >= maxY) { y = maxY; vy = -Math.abs(vy); }
+
+                    apply();
+                }
+                requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+
+            // ---- Arrastar para qualquer lugar ----
+            function pointerDown(e) {
+                dragging = true;
+                helix.style.animationPlayState = 'paused';
+                const p = e.touches ? e.touches[0] : e;
+                dragOffX = p.clientX - x;
+                dragOffY = p.clientY - y;
+                lastX = p.clientX; lastY = p.clientY; lastT = performance.now();
+                e.preventDefault();
+            }
+            function pointerMove(e) {
+                if (!dragging) return;
+                const p = e.touches ? e.touches[0] : e;
+                x = p.clientX - dragOffX;
+                y = p.clientY - dragOffY;
+
+                // limita dentro da tela
+                x = Math.max(0, Math.min(x, window.innerWidth - w()));
+                y = Math.max(0, Math.min(y, window.innerHeight - h()));
+                apply();
+
+                // calcula velocidade para o "arremesso"
+                const now = performance.now();
+                const dt = now - lastT || 16;
+                vx = ((p.clientX - lastX) / dt) * 12;
+                vy = ((p.clientY - lastY) / dt) * 12;
+                lastX = p.clientX; lastY = p.clientY; lastT = now;
+                e.preventDefault();
+            }
+            function pointerUp() {
+                if (!dragging) return;
+                dragging = false;
+                helix.style.animationPlayState = 'running';
+                // limita a velocidade após soltar
+                const max = 6;
+                vx = Math.max(-max, Math.min(max, vx || (Math.random() < 0.5 ? -1 : 1)));
+                vy = Math.max(-max, Math.min(max, vy || (Math.random() < 0.5 ? -1 : 1)));
+                if (Math.abs(vx) < 0.4) vx = (vx < 0 ? -1 : 1) * 0.8;
+                if (Math.abs(vy) < 0.4) vy = (vy < 0 ? -1 : 1) * 0.8;
+            }
+
+            dna.addEventListener('mousedown', pointerDown);
+            window.addEventListener('mousemove', pointerMove);
+            window.addEventListener('mouseup', pointerUp);
+            dna.addEventListener('touchstart', pointerDown, { passive: false });
+            window.addEventListener('touchmove', pointerMove, { passive: false });
+            window.addEventListener('touchend', pointerUp);
+
+            // Mantém dentro da tela ao redimensionar
+            window.addEventListener('resize', () => {
+                x = Math.min(x, window.innerWidth - w());
+                y = Math.min(y, window.innerHeight - h());
+                apply();
+            });
+        })();
     </script>
 
 </body>
