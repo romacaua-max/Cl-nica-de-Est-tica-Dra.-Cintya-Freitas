@@ -346,148 +346,262 @@
         /* ===== DNA FLUTUANTE ===== */
         .floating-dna {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate3d(-50%, -50%, 0);
-            width: 124px;
-            height: 220px;
-            z-index: 9000;
+            top: 0;
+            left: 0;
+            /* posição inicial (o JavaScript assume o controle logo em seguida) */
+            transform: translate3d(calc(50vw - 35px), calc(50vh - 70px), 0);
+            will-change: transform;
+            width: 70px;
+            height: 140px;
+            z-index: 60;
             cursor: grab;
             user-select: none;
             -webkit-user-select: none;
-            -webkit-user-drag: none;
             -webkit-touch-callout: none;
-            touch-action: none;
-            -ms-touch-action: none;
-            transition: opacity 0.45s ease, filter 0.45s ease;
-            opacity: 0.92;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: none; /* impede o scroll da página enquanto arrasta o DNA */
+            transition: opacity 0.5s ease, filter 0.5s ease;
+            opacity: 0.8;
             pointer-events: auto;
-            filter: drop-shadow(0 6px 26px rgba(126, 98, 66, 0.35));
-            will-change: left, top;
+            filter: drop-shadow(0 0 14px rgba(179, 146, 104, 0.45));
         }
 
-        .floating-dna * {
-            pointer-events: none;
-            -webkit-user-drag: none;
-            user-select: none;
-        }
-
-        /* Área extra de toque invisível */
-        .floating-dna::after {
+        /* Área de toque ampliada (mais fácil de agarrar com o dedo) */
+        .floating-dna::before {
             content: '';
             position: absolute;
-            inset: -30px;
-            z-index: -1;
+            inset: -18px;
+            border-radius: 50%;
+        }
+
+        .floating-dna img,
+        .floating-dna svg {
+            pointer-events: none;
+            -webkit-user-drag: none;
         }
 
         .floating-dna:hover {
             opacity: 1;
-            filter: drop-shadow(0 8px 34px rgba(179, 146, 104, 0.65));
+            filter: drop-shadow(0 0 30px rgba(179, 146, 104, 0.8));
         }
 
         .floating-dna.dragging {
             cursor: grabbing;
             opacity: 1;
-            filter: drop-shadow(0 10px 44px rgba(179, 146, 104, 0.9));
-            z-index: 9001;
+            filter: drop-shadow(0 0 40px rgba(179, 146, 104, 1));
         }
 
-        body.dna-dragging {
-            overflow: hidden;
-            overscroll-behavior: none;
-            touch-action: none;
+        .floating-dna.dragging .dna-container {
+            animation-play-state: paused;
         }
 
-        .dna-canvas {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        /* Halo difuso atrás da hélice */
         .dna-aura {
             position: absolute;
             top: 50%; left: 50%;
-            width: 190%; height: 118%;
+            width: 120%; height: 120%;
             transform: translate(-50%, -50%);
-            background: radial-gradient(ellipse at center,
-                rgba(212, 184, 140, 0.30) 0%,
-                rgba(179, 146, 104, 0.14) 38%,
-                transparent 72%);
-            filter: blur(7px);
-            animation: auraPulse 4.5s ease-in-out infinite;
+            background: radial-gradient(circle, rgba(179, 146, 104, 0.25), transparent 70%);
+            border-radius: 50%;
+            animation: auraPulse 3s ease-in-out infinite;
             pointer-events: none;
         }
 
         @keyframes auraPulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.55; }
-            50% { transform: translate(-50%, -50%) scale(1.14); opacity: 1; }
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
         }
 
-        /* Anéis de energia que se expandem */
-        .dna-ring {
+        /* --- Dupla hélice 3D real --- */
+        .floating-dna {
+            --s: 1;                                   /* escala geral */
+            --span: calc(50px * var(--s));            /* largura da hélice */
+            --gap: calc(10.5px * var(--s));           /* distância entre os degraus */
+            --dot: calc(9px * var(--s));              /* tamanho das esferas */
+            --speed: 3.4s;                            /* velocidade do giro */
+            --step: -0.24s;                           /* defasagem entre degraus */
+        }
+        @media (max-width: 768px) { .floating-dna { --s: 0.84; } }
+        @media (max-width: 480px) { .floating-dna { --s: 0.76; } }
+
+        .dna-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            perspective: 520px;
+            transform-style: preserve-3d;
+            animation: dnaFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes dnaFloat {
+            0%, 100% { transform: translateY(-6px); }
+            50% { transform: translateY(6px); }
+        }
+
+        /* Brilho central que dá volume à hélice */
+        .dna-core {
             position: absolute;
-            top: 50%; left: 50%;
-            width: 96px; height: 96px;
-            margin: -48px 0 0 -48px;
+            left: 50%; top: 6%;
+            width: calc(3px * var(--s));
+            height: 88%;
+            margin-left: calc(-1.5px * var(--s));
+            border-radius: 99px;
+            background: linear-gradient(180deg, transparent, rgba(232, 212, 176, 0.75), rgba(179, 146, 104, 0.5), transparent);
+            filter: blur(calc(2.5px * var(--s)));
+            opacity: 0.55;
+            animation: corePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes corePulse {
+            0%, 100% { opacity: 0.35; }
+            50% { opacity: 0.75; }
+        }
+
+        .dna-helix {
+            position: absolute;
+            left: 50%; top: 50%;
+            width: 0; height: 0;
+            transform-style: preserve-3d;
+            transform: rotateX(-8deg) rotateZ(-1.5deg);
+        }
+
+        /* Cada "degrau" gira em torno do eixo vertical -> forma a hélice */
+        .dna-rung {
+            position: absolute;
+            left: 0;
+            top: calc((var(--i) - 6) * var(--gap));
+            width: var(--span);
+            height: 0;
+            margin-left: calc(var(--span) / -2);
+            transform-style: preserve-3d;
+            animation: helixTurn var(--speed) linear infinite;
+            animation-delay: calc(var(--i) * var(--step));
+        }
+
+        @keyframes helixTurn {
+            from { transform: rotateY(0deg); }
+            to   { transform: rotateY(360deg); }
+        }
+
+        /* Ponte entre as duas fitas (par de bases) */
+        .dna-bar {
+            position: absolute;
+            left: 0; top: 0;
+            width: 100%;
+            height: calc(2.2px * var(--s));
+            margin-top: calc(-1.1px * var(--s));
+            border-radius: 99px;
+            background: linear-gradient(90deg,
+                rgba(179, 146, 104, 0.15),
+                rgba(244, 228, 198, 0.95) 35%,
+                rgba(212, 184, 140, 0.95) 65%,
+                rgba(179, 146, 104, 0.15));
+            box-shadow: 0 0 calc(4px * var(--s)) rgba(212, 184, 140, 0.55);
+            animation: barFade var(--speed) linear infinite;
+            animation-delay: calc(var(--i) * var(--step));
+        }
+
+        @keyframes barFade {
+            0%, 50%, 100% { opacity: 0.95; }
+            25%, 75%      { opacity: 0.18; }
+        }
+
+        /* Esferas das fitas (com luz, sombra e profundidade) */
+        .dna-node {
+            position: absolute;
+            top: 0;
+            width: var(--dot);
+            height: var(--dot);
+            margin-top: calc(var(--dot) / -2);
+            margin-left: calc(var(--dot) / -2);
             border-radius: 50%;
-            border: 1px solid rgba(179, 146, 104, 0.45);
-            animation: ringExpand 3.8s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+            animation: nodeDepth var(--speed) linear infinite;
+        }
+
+        .dna-node.a {
+            left: 0;
+            background: radial-gradient(circle at 32% 28%, #FFFaF0 0%, #EBD4AC 38%, #B89164 72%, #8A6838 100%);
+            box-shadow: 0 0 calc(7px * var(--s)) rgba(232, 212, 176, 0.9);
+            animation-delay: calc(var(--i) * var(--step));
+        }
+
+        .dna-node.b {
+            left: 100%;
+            background: radial-gradient(circle at 32% 28%, #FFF3DD 0%, #D9B98A 38%, #A17C4C 72%, #6F5228 100%);
+            box-shadow: 0 0 calc(7px * var(--s)) rgba(196, 162, 112, 0.85);
+            /* meia volta de defasagem: fica sempre do lado oposto */
+            animation-delay: calc(var(--i) * var(--step) - (var(--speed) / 2));
+        }
+
+        /* Frente = maior e mais clara | Fundo = menor e mais escura */
+        @keyframes nodeDepth {
+            0%   { transform: scale(1);    filter: brightness(1);    opacity: 0.9; }
+            25%  { transform: scale(1.28); filter: brightness(1.35); opacity: 1; }
+            50%  { transform: scale(1);    filter: brightness(1);    opacity: 0.9; }
+            75%  { transform: scale(0.68); filter: brightness(0.5);  opacity: 0.5; }
+            100% { transform: scale(1);    filter: brightness(1);    opacity: 0.9; }
+        }
+
+        .dna-sparkle {
+            position: absolute;
+            color: #D4B88C;
+            font-size: 10px;
+            animation: sparkle 2.5s ease-in-out infinite;
             pointer-events: none;
-        }
-
-        .dna-ring::after {
-            content: '';
-            position: absolute;
-            inset: -1px;
-            border-radius: 50%;
-            border: 1px solid rgba(232, 212, 176, 0.35);
-            animation: ringExpand 3.8s 1.9s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
-        }
-
-        @keyframes ringExpand {
-            0% { transform: scale(0.45); opacity: 0.85; }
-            70% { opacity: 0.18; }
-            100% { transform: scale(1.75); opacity: 0; }
-        }
-
-        .floating-dna.dragging .dna-ring {
-            animation-duration: 1.6s;
-        }
-        .floating-dna.dragging .dna-ring::after {
-            animation-duration: 1.6s;
-        }
-        .floating-dna.dragging .dna-aura {
-            animation-duration: 1.8s;
         }
 
         /* Responsividade do DNA */
         @media (max-width: 768px) {
             .floating-dna {
-                width: 104px;
-                height: 186px;
-                opacity: 0.95;
-            }
-            .floating-dna:hover,
-            .floating-dna:active {
-                opacity: 1;
-            }
-            .floating-dna::after {
-                inset: -34px;
-            }
-            .dna-ring {
-                width: 78px; height: 78px;
-                margin: -39px 0 0 -39px;
+                width: 58px;
+                height: 116px;
+                opacity: 0.8;
+                filter: drop-shadow(0 0 12px rgba(179, 146, 104, 0.6));
             }
         }
 
-        @media (max-width: 400px) {
+        @media (max-width: 480px) {
             .floating-dna {
-                width: 92px;
-                height: 166px;
+                width: 52px;
+                height: 104px;
             }
+        }
+
+        /* Dispositivos de toque: sem "hover" preso após tocar */
+        @media (hover: none) {
+            .floating-dna { opacity: 0.8; }
+            .floating-dna:hover { opacity: 0.8; filter: drop-shadow(0 0 12px rgba(179, 146, 104, 0.6)); }
+            .floating-dna.dragging,
+            .floating-dna.dragging:hover {
+                opacity: 1;
+                filter: drop-shadow(0 0 22px rgba(179, 146, 104, 1));
+            }
+            .floating-dna:hover:not(.show-hint) .dna-hint { opacity: 0; }
+        }
+
+        /* Animação para chamar atenção (celular) */
+        .floating-dna.attention .dna-aura {
+            animation: auraAttention 1.1s ease-in-out 4;
+        }
+        @keyframes auraAttention {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+            50% { transform: translate(-50%, -50%) scale(2.4); opacity: 1; }
+        }
+
+        /* Efeito ao tocar (pop) */
+        .floating-dna.pop .dna-aura {
+            animation: auraBurst 0.6s ease-out;
+        }
+        @keyframes auraBurst {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+        }
+
+        /* Anel de arraste ativo */
+        .floating-dna.dragging .dna-aura {
+            animation: none;
+            transform: translate(-50%, -50%) scale(1.8);
+            opacity: 1;
+            transition: transform 0.25s ease;
         }
 
         /* Dica de arrastar */
@@ -524,6 +638,21 @@
         .floating-dna:hover .dna-hint,
         .floating-dna.show-hint .dna-hint {
             opacity: 1;
+        }
+
+        .floating-dna.dragging .dna-hint {
+            opacity: 0 !important;
+        }
+
+        /* Quando o DNA está na metade de baixo da tela, a dica aparece acima */
+        .floating-dna.hint-above .dna-hint {
+            top: auto;
+            bottom: calc(100% + 8px);
+        }
+        .floating-dna.hint-above .dna-hint::before {
+            top: auto;
+            bottom: -4px;
+            transform: translateX(-50%) rotate(225deg);
         }
 
         /* ===== ANIMAÇÕES ESPECÍFICAS PARA MOBILE ===== */
@@ -828,383 +957,999 @@
                     <div class="aspect-[4/3] sm:aspect-[16/10] rounded-2xl shadow-2xl overflow-hidden border-4 border-white relative group">
                         <img src="hero.jpg" alt="Recepção Clínica Dra. Cintya Freitas" class="object-cover w-full h-full transition-transform duration-[1.5s] group-hover:scale-110">
                         
-                        <!-- Marcador de Localização -->
-                        <div class="location-badge absolute bottom-4 left-4 bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-lg flex items-center gap-3 border border-clinic-gold/20">
-                            <div class="w-8 h-8 rounded-full bg-clinic-gold/20 text-clinic-gold flex items-center justify-center">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </div>
-                            <div>
-                                <p class="text-xs font-bold text-clinic-dark">Estreito - MA</p>
-                                <p class="text-[10px] text-gray-500">Atendimento presencial</p>
-                            </div>
+                        <!-- Marcador -->
+                        <div class="location-badge absolute bottom-3 right-3 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 text-white text-xs flex items-center gap-1.5 shadow-md z-10">
+                            <i class="fas fa-map-marker-alt text-clinic-gold text-xs" style="animation: bounceSubtle 1.5s infinite;"></i>
+                            <span class="font-medium tracking-wide">Estreito - MA</span>
                         </div>
+
+                        <!-- Overlay dourado ao hover -->
+                        <div class="absolute inset-0 bg-gradient-to-tr from-clinic-gold/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                    </div>
+
+                    <!-- Elemento decorativo flutuante -->
+                    <div class="absolute -top-4 -right-4 bg-white rounded-full p-3 shadow-xl floating hidden sm:block">
+                        <i class="fas fa-heart text-clinic-gold text-xl"></i>
+                    </div>
+                    <div class="absolute -bottom-4 -left-4 bg-clinic-gold text-white rounded-full p-3 shadow-xl floating-slow hidden sm:block">
+                        <i class="fas fa-award text-xl"></i>
                     </div>
                 </div>
+            </div>
+
+            <!-- Indicador de Scroll -->
+            <div class="hidden lg:flex justify-center mt-12 scroll-indicator">
+                <a href="#procedimentos" class="flex flex-col items-center text-clinic-gold/60 hover:text-clinic-gold transition-colors">
+                    <span class="text-xs uppercase tracking-widest mb-2">Role para ver mais</span>
+                    <i class="fas fa-chevron-down"></i>
+                </a>
             </div>
         </div>
     </section>
 
-    <!-- Seção Procedimentos -->
-    <section id="procedimentos" class="py-20 bg-white relative">
+    <!-- Catálogo de Procedimentos e Tratamentos -->
+    <section id="procedimentos" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto mb-16 reveal reveal-up">
-                <span class="text-clinic-gold font-semibold text-xs uppercase tracking-widest">Nossos Serviços</span>
-                <h2 class="text-3xl sm:text-4xl font-serif font-bold text-clinic-dark mt-2 title-decoration">Procedimentos Exclusivos</h2>
-                <p class="text-gray-600 mt-4 text-sm sm:text-base">Tecnologia avançada combinada com técnicas personalizadas para realçar sua beleza natural.</p>
+                <span class="text-xs font-semibold uppercase tracking-widest text-clinic-gold">Nossos Serviços</span>
+                <h2 class="text-3xl sm:text-4xl font-serif font-bold text-clinic-dark mt-2 title-decoration">Catálogo de Tratamentos</h2>
+                <p class="text-gray-600 mt-6">Procedimentos personalizados para cuidados faciais, corporais, saúde injetável e depilação a laser.</p>
             </div>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Card 1 -->
-                <div class="procedure-card bg-clinic-sand/50 rounded-2xl p-8 border border-clinic-gold/15 reveal reveal-up delay-100">
-                    <div class="w-14 h-14 rounded-2xl bg-clinic-gold/10 text-clinic-gold flex items-center justify-center text-2xl mb-6 category-icon">
-                        <i class="fas fa-[#]">✨</i>
+            <!-- Categoria 1 -->
+            <div class="mb-14 reveal reveal-up">
+                <h3 class="category-title text-2xl font-serif font-bold text-clinic-gold mb-6 border-b border-clinic-gold/20 pb-2 flex items-center gap-2">
+                    <i class="fas fa-sparkles text-lg category-icon"></i> Estética Facial & Rejuvenescimento
+                </h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="procedure-card bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between reveal reveal-up" style="animation-delay: 0.1s;">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-serif font-bold text-lg text-clinic-dark">Limpeza de Pele Premium</h4>
+                                <span class="bg-clinic-gold/10 text-clinic-gold font-bold text-sm px-3 py-1 rounded-full">R$ 145,00</span>
+                            </div>
+                            <p class="text-gray-600 text-xs leading-relaxed mb-4">
+                                Remove impurezas acumuladas como suor, oleosidade, poluição e maquiagem. Desobstrui os poros, prevenindo cravos, espinhas e o envelhecimento precoce.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/9984358685?text=Olá!%20Gostaria%20de%20agendar%20uma%20Limpeza%20de%20pele%20Premium" target="_blank" class="text-clinic-gold font-semibold text-xs flex items-center gap-1 hover:gap-2 transition-all mt-2">
+                            Agendar procedimento <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
-                    <h3 class="text-xl font-serif font-bold text-clinic-dark mb-3">Harmonização Facial</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed mb-6">Preenchimentos, toxina botulínica e bioestimuladores de colágeno para um resultado natural e rejuvenescido.</p>
-                    <a href="https://wa.me/9984358685?text=Quero%20saber%20mais%20sobre%20Harmonização%20Facial" target="_blank" class="text-clinic-gold font-semibold text-sm inline-flex items-center gap-2 hover:gap-3 transition-all">
-                        Saber mais <i class="fas fa-arrow-right text-xs"></i>
-                    </a>
-                </div>
 
-                <!-- Card 2 -->
-                <div class="procedure-card bg-clinic-sand/50 rounded-2xl p-8 border border-clinic-gold/15 reveal reveal-up delay-200">
-                    <div class="w-14 h-14 rounded-2xl bg-clinic-gold/10 text-clinic-gold flex items-center justify-center text-2xl mb-6 category-icon">
-                        <i class="fas fa-[#]">⚡</i>
+                    <div class="procedure-card bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between reveal reveal-up" style="animation-delay: 0.2s;">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-serif font-bold text-lg text-clinic-dark">Skinbooster</h4>
+                                <span class="bg-clinic-gold/10 text-clinic-gold font-bold text-sm px-3 py-1 rounded-full">R$ 400,00</span>
+                            </div>
+                            <p class="text-gray-600 text-xs leading-relaxed mb-4">
+                                Hidratação profunda injetável com ácido hialurônico para tratar a pele internamente, suavizar linhas finas e rejuvenescer o tecido facial.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/9984358685?text=Olá!%20Gostaria%20de%20agendar%20o%20tratamento%20Skinbooster" target="_blank" class="text-clinic-gold font-semibold text-xs flex items-center gap-1 hover:gap-2 transition-all mt-2">
+                            Agendar procedimento <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
-                    <h3 class="text-xl font-serif font-bold text-clinic-dark mb-3">Depilação a Laser</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed mb-6">Tecnologia indolor e eficaz para eliminação permanente dos pelos em todos os tipos de pele.</p>
-                    <a href="https://wa.me/9984358685?text=Quero%20saber%20mais%20sobre%20Depilação%20a%20Laser" target="_blank" class="text-clinic-gold font-semibold text-sm inline-flex items-center gap-2 hover:gap-3 transition-all">
-                        Saber mais <i class="fas fa-arrow-right text-xs"></i>
-                    </a>
-                </div>
 
-                <!-- Card 3 -->
-                <div class="procedure-card bg-clinic-sand/50 rounded-2xl p-8 border border-clinic-gold/15 reveal reveal-up delay-300">
-                    <div class="w-14 h-14 rounded-2xl bg-clinic-gold/10 text-clinic-gold flex items-center justify-center text-2xl mb-6 category-icon">
-                        <i class="fas fa-[#]">🌿</i>
+                    <div class="procedure-card bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between reveal reveal-up" style="animation-delay: 0.3s;">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-serif font-bold text-lg text-clinic-dark">Botox Terço Superior</h4>
+                                <span class="bg-clinic-gold/10 text-clinic-gold font-bold text-sm px-3 py-1 rounded-full">R$ 1.250,00</span>
+                            </div>
+                            <p class="text-gray-600 text-xs leading-relaxed mb-4">
+                                Aplicação de Toxina Botulínica para suavizar rugas e linhas de expressão da testa, glabela e olhos, prevenindo o envelhecimento.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/9984358685?text=Olá!%20Gostaria%20de%20agendar%20Botox%20terço%20superior" target="_blank" class="text-clinic-gold font-semibold text-xs flex items-center gap-1 hover:gap-2 transition-all mt-2">
+                            Agendar procedimento <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
-                    <h3 class="text-xl font-serif font-bold text-clinic-dark mb-3">Estética Corporal</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed mb-6">Tratamentos para gordura localizada, celulite, flacidez e protocolos exclusivos de emagrecimento.</p>
-                    <a href="https://wa.me/9984358685?text=Quero%20saber%20mais%20sobre%20Estética%20Corporal" target="_blank" class="text-clinic-gold font-semibold text-sm inline-flex items-center gap-2 hover:gap-3 transition-all">
-                        Saber mais <i class="fas fa-arrow-right text-xs"></i>
-                    </a>
+
+                    <div class="procedure-card bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between reveal reveal-up" style="animation-delay: 0.4s;">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-serif font-bold text-lg text-clinic-dark">Botox Full Face</h4>
+                                <span class="bg-clinic-gold/10 text-clinic-gold font-bold text-sm px-3 py-1 rounded-full">R$ 1.850,00</span>
+                            </div>
+                            <p class="text-gray-600 text-xs leading-relaxed mb-4">
+                                Tratamento completo com toxina botulínica para suavizar linhas de expressão, levantar pontos estratégicos do rosto e proporcionar um aspecto harmonizado.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/9984358685?text=Olá!%20Gostaria%20de%20agendar%20Botox%20Full%20Face" target="_blank" class="text-clinic-gold font-semibold text-xs flex items-center gap-1 hover:gap-2 transition-all mt-2">
+                            Agendar procedimento <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="procedure-card bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between reveal reveal-up" style="animation-delay: 0.5s;">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-serif font-bold text-lg text-clinic-dark">Fios de Sustentação (6 Un)</h4>
+                                <span class="bg-clinic-gold/10 text-clinic-gold font-bold text-sm px-3 py-1 rounded-full">R$ 2.100,00</span>
+                            </div>
+                            <p class="text-gray-600 text-xs leading-relaxed mb-4">
+                                Lifting imediato com fios espiculados que promovem a sustentação dos tecidos por até 8 meses e estimulam o colágeno natural por até 1 ano.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/9984358685?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20os%20Fios%20de%20Sustentação" target="_blank" class="text-clinic-gold font-semibold text-xs flex items-center gap-1 hover:gap-2 transition-all mt-2">
+                            Agendar procedimento <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="procedure-card bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between reveal reveal-up" style="animation-delay: 0.6s;">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-serif font-bold text-lg text-clinic-dark">Bioestimulador de Colágeno</h4>
+                                <span class="bg-clinic-gold/10 text-clinic-gold font-bold text-xs px-3 py-1 rounded-full">Sob Consulta</span>
+                            </div>
+                            <p class="text-gray-600 text-xs leading-relaxed mb-4">
+                                Estímulo profundo na produção natural de colágeno pelo organismo, proporcionando maior firmeza, elasticidade e sustentação da pele.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/9984358685?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20o%20Bioestimulador%20de%20colágeno" target="_blank" class="text-clinic-gold font-semibold text-xs flex items-center gap-1 hover:gap-2 transition-all mt-2">
+                            Consultar detalhes <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categoria 2 -->
+            <div class="mb-14 reveal reveal-up">
+                <h3 class="category-title text-2xl font-serif font-bold text-clinic-gold mb-6 border-b border-clinic-gold/20 pb-2 flex items-center gap-2">
+                    <i class="fas fa-syringe text-lg category-icon"></i> Saúde Injetável, Vitaminas & Emagrecimento
+                </h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="procedure-card bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between reveal reveal-up" style="animation-delay: 0.1s;">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-serif font-bold text-lg text-clinic-dark">BCAA Injetável</h4>
+                                <span class="bg-clinic-gold/10 text-clinic-gold font-bold text-sm px-3 py-1 rounded-full">R$ 100,00</span>
+                            </div>
+                            <p class="text-gray-600 text-xs leading-relaxed mb-4">
+                                Aplicação de aminoácidos essenciais para auxiliar no ganho de massa magra, definição corporal, aceleração do metabolismo e recuperação muscular.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/9984358685?text=Olá!%20Gostaria%20de%20agendar%20BCAA%20injetável" target="_blank" class="text-clinic-gold font-semibold text-xs flex items-center gap-1 hover:gap-2 transition-all mt-2">
+                            Agendar procedimento <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="procedure-card bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between reveal reveal-up" style="animation-delay: 0.2s;">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-serif font-bold text-lg text-clinic-dark">Vitamina B12 Injetável</h4>
+                                <span class="bg-clinic-gold/10 text-clinic-gold font-bold text-sm px-3 py-1 rounded-full">R$ 120,00</span>
+                            </div>
+                            <p class="text-gray-600 text-xs leading-relaxed mb-4">
+                                Reposição direta que atua combatendo o cansaço e a fadiga, fortalecendo a imunidade, a disposição diária e a saúde do sistema nervoso.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/9984358685?text=Olá!%20Gostaria%20de%20agendar%20Reposição%20de%20Vitamina%20B12" target="_blank" class="text-clinic-gold font-semibold text-xs flex items-center gap-1 hover:gap-2 transition-all mt-2">
+                            Agendar procedimento <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="procedure-card bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between reveal reveal-up" style="animation-delay: 0.3s;">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-serif font-bold text-lg text-clinic-dark">Vitamina ADEK Injetável</h4>
+                                <span class="bg-clinic-gold/10 text-clinic-gold font-bold text-sm px-3 py-1 rounded-full">R$ 135,00</span>
+                            </div>
+                            <p class="text-gray-600 text-xs leading-relaxed mb-4">
+                                Suplementação completa rica em Vitamina D e lipossolúveis. Fundamental para imunidade, equilíbrio hormonal, saúde muscular e vitalidade.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/9984358685?text=Olá!%20Gostaria%20de%20agendar%20Reposição%20de%20Vitamina%20ADEK" target="_blank" class="text-clinic-gold font-semibold text-xs flex items-center gap-1 hover:gap-2 transition-all mt-2">
+                            Agendar procedimento <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="procedure-card bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between reveal reveal-up" style="animation-delay: 0.4s;">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-serif font-bold text-lg text-clinic-dark">Doses Emagrecedoras</h4>
+                                <span class="bg-clinic-gold/10 text-clinic-gold font-bold text-xs px-3 py-1 rounded-full">Sob Consulta</span>
+                            </div>
+                            <p class="text-gray-600 text-xs leading-relaxed mb-4">
+                                Protocolo injetável focado no estímulo metabólico, aceleração da queima gordurosa e suporte no processo de redução de medidas e perda de peso.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/9984358685?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20as%20Doses%20emagrecedoras" target="_blank" class="text-clinic-gold font-semibold text-xs flex items-center gap-1 hover:gap-2 transition-all mt-2">
+                            Consultar detalhes <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="procedure-card bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between reveal reveal-up" style="animation-delay: 0.5s;">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-serif font-bold text-lg text-clinic-dark">Reposição de Coenzima Q10</h4>
+                                <span class="bg-clinic-gold/10 text-clinic-gold font-bold text-xs px-3 py-1 rounded-full">Sob Consulta</span>
+                            </div>
+                            <p class="text-gray-600 text-xs leading-relaxed mb-4">
+                                Suplementação estéril e injetável de Coenzima Q10, potente antioxidante celular que auxilia na energia, saúde da pele e longevidade.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/9984358685?text=Olá!%20Gostaria%20de%20agendar%20Reposição%20de%20Coenzima%20Q10" target="_blank" class="text-clinic-gold font-semibold text-xs flex items-center gap-1 hover:gap-2 transition-all mt-2">
+                            Consultar detalhes <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="procedure-card bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between reveal reveal-up" style="animation-delay: 0.6s;">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-serif font-bold text-lg text-clinic-dark">Vitamina Complexo B Plus</h4>
+                                <span class="bg-clinic-gold/10 text-clinic-gold font-bold text-xs px-3 py-1 rounded-full">Sob Consulta</span>
+                            </div>
+                            <p class="text-gray-600 text-xs leading-relaxed mb-4">
+                                Aplicação do complexo de vitaminas do grupo B para otimização da disposição, reforço do sistema metabólico e saúde integral.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/9984358685?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20a%20Reposição%20de%20vitamina%20complexo%20B%20Plus" target="_blank" class="text-clinic-gold font-semibold text-xs flex items-center gap-1 hover:gap-2 transition-all mt-2">
+                            Consultar detalhes <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categoria 3 -->
+            <div class="reveal reveal-up">
+                <h3 class="category-title text-2xl font-serif font-bold text-clinic-gold mb-6 border-b border-clinic-gold/20 pb-2 flex items-center gap-2">
+                    <i class="fas fa-wand-magic-sparkles text-lg category-icon"></i> Estética Corporal & Depilação a Laser
+                </h3>
+                <div class="grid md:grid-cols-4 gap-6">
+                    <div class="procedure-card bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between reveal reveal-zoom" style="animation-delay: 0.1s;">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-serif font-bold text-base text-clinic-dark">Retirada de Vasinhos</h4>
+                                <span class="bg-clinic-gold/10 text-clinic-gold font-bold text-sm px-2.5 py-1 rounded-full">R$ 250,00</span>
+                            </div>
+                            <p class="text-gray-600 text-xs leading-relaxed mb-4">
+                                Tratamento minimamente invasivo para eliminar vasinhos aparentes, melhorando a uniformidade e estética da pele com rapidez e segurança.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/9984358685?text=Olá!%20Gostaria%20de%20agendar%20a%20Retirada%20de%20vasinhos" target="_blank" class="text-clinic-gold font-semibold text-xs flex items-center gap-1 hover:gap-2 transition-all mt-2">
+                            Agendar <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="procedure-card bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between reveal reveal-zoom" style="animation-delay: 0.2s;">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-serif font-bold text-base text-clinic-dark">Laser - Axilas</h4>
+                                <span class="bg-clinic-gold/10 text-clinic-gold font-bold text-xs px-2.5 py-1 rounded-full">Sob Consulta</span>
+                            </div>
+                            <p class="text-gray-600 text-xs leading-relaxed mb-4">
+                                Remoção duradoura, confortável e segura dos pelos da região das axilas utilizando tecnologia de laser avançada.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/9984358685?text=Olá!%20Gostaria%20de%20saber%20sobre%20Depilação%20a%20laser%20para%20Axilas" target="_blank" class="text-clinic-gold font-semibold text-xs flex items-center gap-1 hover:gap-2 transition-all mt-2">
+                            Agendar <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="procedure-card bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between reveal reveal-zoom" style="animation-delay: 0.3s;">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-serif font-bold text-base text-clinic-dark">Laser - Virilha Completa</h4>
+                                <span class="bg-clinic-gold/10 text-clinic-gold font-bold text-xs px-2.5 py-1 rounded-full">Sob Consulta</span>
+                            </div>
+                            <p class="text-gray-600 text-xs leading-relaxed mb-4">
+                                Depilação a laser direcionada para a região da virilha completa com máximo conforto e resultados eficientes.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/9984358685?text=Olá!%20Gostaria%20de%20saber%20sobre%20Depilação%20a%20laser%20Virilha%20completa" target="_blank" class="text-clinic-gold font-semibold text-xs flex items-center gap-1 hover:gap-2 transition-all mt-2">
+                            Agendar <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="procedure-card bg-clinic-sand p-6 rounded-2xl border border-clinic-gold/10 flex flex-col justify-between reveal reveal-zoom" style="animation-delay: 0.4s;">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-serif font-bold text-base text-clinic-dark">Laser - Combo Promocional</h4>
+                                <span class="bg-clinic-gold/10 text-clinic-gold font-bold text-xs px-2.5 py-1 rounded-full">Combo Especial</span>
+                            </div>
+                            <p class="text-gray-600 text-xs leading-relaxed mb-4">
+                                Pacote completo de depilação a laser contemplando <strong>Axilas + Virilha completa + Região Perianal</strong>.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/9984358685?text=Olá!%20Gostaria%20de%20saber%20o%20valor%20do%20Combo%20Depilação%20a%20laser%20(Axilas,%20Virilha%20completa%20e%20perianal)" target="_blank" class="text-clinic-gold font-semibold text-xs flex items-center gap-1 hover:gap-2 transition-all mt-2">
+                            Consultar Combo <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Seção A Clínica / Galeria -->
-    <section id="galeria" class="py-20 bg-clinic-sand/60 relative">
+    <!-- Seção de Localização -->
+    <section id="localizacao" class="py-16 bg-white border-t border-clinic-gold/10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-16 reveal reveal-up">
-                <span class="text-clinic-gold font-semibold text-xs uppercase tracking-widest">Nosso Espaço</span>
-                <h2 class="text-3xl sm:text-4xl font-serif font-bold text-clinic-dark mt-2 title-decoration">Conheça a Clínica</h2>
-                <p class="text-gray-600 mt-4 text-sm sm:text-base">Um ambiente projetado para oferecer o máximo em conforto, biossegurança e bem-estar.</p>
-            </div>
-
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="gallery-item rounded-2xl overflow-hidden shadow-md aspect-square bg-gray-200 reveal reveal-zoom delay-100">
-                    <img src="clinica-1.jpg" alt="Ambiente da Clínica 1" class="w-full h-full object-cover">
-                </div>
-                <div class="gallery-item rounded-2xl overflow-hidden shadow-md aspect-square bg-gray-200 reveal reveal-zoom delay-200">
-                    <img src="clinica-2.jpg" alt="Ambiente da Clínica 2" class="w-full h-full object-cover">
-                </div>
-                <div class="gallery-item rounded-2xl overflow-hidden shadow-md aspect-square bg-gray-200 reveal reveal-zoom delay-300">
-                    <img src="clinica-3.jpg" alt="Ambiente da Clínica 3" class="w-full h-full object-cover">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Seção Avaliações -->
-    <section id="avaliacoes" class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-16 reveal reveal-up">
-                <span class="text-clinic-gold font-semibold text-xs uppercase tracking-widest">Depoimentos</span>
-                <h2 class="text-3xl sm:text-4xl font-serif font-bold text-clinic-dark mt-2 title-decoration">O que dizem nossas clientes</h2>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Avaliação 1 -->
-                <div class="testimonial-card bg-clinic-sand/40 p-8 rounded-2xl border border-clinic-gold/15 relative reveal reveal-up delay-100">
-                    <i class="fas fa-quote-right quote-icon absolute top-6 right-6 text-3xl text-clinic-gold/20"></i>
-                    <div class="flex text-yellow-500 mb-4 gap-1">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                    </div>
-                    <p class="text-gray-600 text-sm italic mb-6">"Atendimento impecável! A Dra. Cintya é super atenciosa e detalhista. Os resultados superaram minhas expectativas."</p>
-                    <p class="font-bold text-sm text-clinic-dark">— Maria Silva</p>
-                </div>
-
-                <!-- Avaliação 2 -->
-                <div class="testimonial-card bg-clinic-sand/40 p-8 rounded-2xl border border-clinic-gold/15 relative reveal reveal-up delay-200">
-                    <i class="fas fa-quote-right quote-icon absolute top-6 right-6 text-3xl text-clinic-gold/20"></i>
-                    <div class="flex text-yellow-500 mb-4 gap-1">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                    </div>
-                    <p class="text-gray-600 text-sm italic mb-6">"Melhor clínica de Estreito! A estrutura é linda e os procedimentos são feitos com muita segurança."</p>
-                    <p class="font-bold text-sm text-clinic-dark">— Fernanda Oliveira</p>
-                </div>
-
-                <!-- Avaliação 3 -->
-                <div class="testimonial-card bg-clinic-sand/40 p-8 rounded-2xl border border-clinic-gold/15 relative reveal reveal-up delay-300">
-                    <i class="fas fa-quote-right quote-icon absolute top-6 right-6 text-3xl text-clinic-gold/20"></i>
-                    <div class="flex text-yellow-500 mb-4 gap-1">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                    </div>
-                    <p class="text-gray-600 text-sm italic mb-6">"Fiz depilação a laser e o resultado foi incrível desde as primeiras sessões. Recomendo de olhos fechados!"</p>
-                    <p class="font-bold text-sm text-clinic-dark">— Juliana Santos</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Seção Localização & Contato -->
-    <section id="localizacao" class="py-20 bg-clinic-sand/40">
-        <div id="contato" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid lg:grid-cols-2 gap-12 items-center">
-                <div class="space-y-6 reveal reveal-left">
-                    <span class="text-clinic-gold font-semibold text-xs uppercase tracking-widest">Contato & Endereço</span>
-                    <h2 class="text-3xl sm:text-4xl font-serif font-bold text-clinic-dark">Venha nos visitar</h2>
-                    <p class="text-gray-600 text-sm sm:text-base leading-relaxed">
-                        Estamos prontos para atende-la com todo o carinho e cuidado que você merece.
+            <div class="bg-clinic-sand p-8 sm:p-12 rounded-3xl border border-clinic-gold/20 shadow-sm grid md:grid-cols-2 gap-8 items-center reveal reveal-up">
+                <div class="reveal reveal-left">
+                    <span class="text-xs font-semibold uppercase tracking-widest text-clinic-gold">Atendimento Presencial</span>
+                    <h2 class="text-3xl font-serif font-bold text-clinic-dark mt-2 mb-4">Onde Estamos</h2>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-6">
+                        Nossa clínica está localizada no coração de <strong>Estreito - MA</strong>, em um ambiente preparado com todo conforto, acessibilidade e fácil estacionamento.
                     </p>
-                    
-                    <div class="space-y-4 pt-2">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full bg-clinic-gold/10 text-clinic-gold flex items-center justify-center shrink-0">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </div>
-                            <p class="text-sm text-gray-700">Estreito - MA, Brasil</p>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full bg-clinic-gold/10 text-clinic-gold flex items-center justify-center shrink-0">
-                                <i class="fab fa-whatsapp"></i>
-                            </div>
-                            <p class="text-sm text-gray-700">(99) 98435-8685</p>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full bg-clinic-gold/10 text-clinic-gold flex items-center justify-center shrink-0">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <p class="text-sm text-gray-700">Segunda a Sexta: 08:00h às 18:00h</p>
+                    <div class="space-y-3 text-sm text-gray-700 mb-8">
+                        <p class="flex items-center gap-3 hover:translate-x-2 transition-transform duration-300">
+                            <i class="fas fa-map-marker-alt text-clinic-gold text-lg w-5 text-center floating"></i>
+                            <span><strong>Cidade:</strong> Estreito - MA</span>
+                        </p>
+                        <p class="flex items-center gap-3 hover:translate-x-2 transition-transform duration-300">
+                            <i class="far fa-clock text-clinic-gold text-lg w-5 text-center floating" style="animation-delay: 0.5s;"></i>
+                            <span><strong>Horário:</strong> Segunda a Sexta (Fechamento às 17:00)</span>
+                        </p>
+                        <p class="flex items-center gap-3 hover:translate-x-2 transition-transform duration-300">
+                            <i class="fas fa-parking text-clinic-gold text-lg w-5 text-center floating" style="animation-delay: 1s;"></i>
+                            <span><strong>Estacionamento:</strong> Gratuito no local</span>
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="https://maps.google.com/?q=Clinica+de+Estetica+Dra+Cintya+Freitas+Estreito+MA" target="_blank" class="btn-primary bg-clinic-gold hover:bg-clinic-goldHover text-white px-6 py-3 rounded-full text-xs font-semibold flex items-center gap-2 shadow-md">
+                            <i class="fas fa-location-arrow"></i> Abrir no Google Maps
+                        </a>
+                        <a href="https://wa.me/9984358685?text=Olá!%20Pode%20me%20enviar%20a%20localização%20exata%20da%20clínica?" target="_blank" class="border-2 border-clinic-gold text-clinic-dark hover:bg-clinic-gold hover:text-white px-6 py-3 rounded-full text-xs font-semibold flex items-center gap-2 transition-all">
+                            <i class="fab fa-whatsapp text-green-600 hover:text-white"></i> Pedir Localização no WhatsApp
+                        </a>
+                    </div>
+                </div>
+                <div class="reveal reveal-right rounded-2xl overflow-hidden border-2 border-clinic-gold/20 shadow-md h-64 sm:h-80 relative group">
+                    <img src="hero.jpg" alt="Localização da Clínica Dra. Cintya Freitas" class="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
+                        <span class="text-white text-xs font-medium bg-clinic-gold/90 px-3 py-1.5 rounded-full backdrop-blur-md">
+                            📍 Clínica Dra. Cintya Freitas • Estreito - MA
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Galeria de Fotos do Espaço -->
+    <section id="galeria" class="py-20 bg-clinic-sand">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12 reveal reveal-up">
+                <span class="text-xs font-semibold uppercase tracking-widest text-clinic-gold">Estrutura</span>
+                <h2 class="text-3xl sm:text-4xl font-serif font-bold text-clinic-dark mt-2 title-decoration">Conheça Nosso Espaço</h2>
+                <p class="text-gray-600 mt-6">Ambiente moderno, acolhedor e preparado para proporcionar o seu bem-estar.</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="gallery-item rounded-xl overflow-hidden shadow-md aspect-square reveal reveal-zoom" style="animation-delay: 0.1s;">
+                    <img src="espaco1.jpg" alt="Consultório" class="w-full h-full object-cover">
+                </div>
+                <div class="gallery-item rounded-xl overflow-hidden shadow-md aspect-square reveal reveal-zoom" style="animation-delay: 0.2s;">
+                    <img src="espaco2.jpg" alt="Sala de Atendimento" class="w-full h-full object-cover">
+                </div>
+                <div class="gallery-item rounded-xl overflow-hidden shadow-md aspect-square reveal reveal-zoom" style="animation-delay: 0.3s;">
+                    <img src="espaco3.jpg" alt="Atendimento Clínico" class="w-full h-full object-cover">
+                </div>
+                <div class="gallery-item rounded-xl overflow-hidden shadow-md aspect-square reveal reveal-zoom" style="animation-delay: 0.4s;">
+                    <img src="mimos.jpg" alt="Recepção e Mimos" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Depoimentos -->
+    <section id="avaliacoes" class="py-20 bg-white border-t border-clinic-gold/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16 reveal reveal-up">
+                <div class="flex justify-center gap-1 text-yellow-400 text-xl mb-2">
+                    <i class="fas fa-star" style="animation: bounceSubtle 2s infinite; animation-delay: 0s;"></i>
+                    <i class="fas fa-star" style="animation: bounceSubtle 2s infinite; animation-delay: 0.1s;"></i>
+                    <i class="fas fa-star" style="animation: bounceSubtle 2s infinite; animation-delay: 0.2s;"></i>
+                    <i class="fas fa-star" style="animation: bounceSubtle 2s infinite; animation-delay: 0.3s;"></i>
+                    <i class="fas fa-star" style="animation: bounceSubtle 2s infinite; animation-delay: 0.4s;"></i>
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-serif font-bold text-clinic-dark title-decoration">Avaliações das Clientes</h2>
+                <p class="text-gray-600 mt-6">Classificação 5,0 de 5 estrelas no Google</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div class="testimonial-card bg-clinic-sand p-8 rounded-2xl border border-clinic-gold/20 relative shadow-sm reveal reveal-left">
+                    <i class="fas fa-quote-left quote-icon text-clinic-gold/20 text-4xl absolute top-6 right-6"></i>
+                    <p class="text-gray-700 italic mb-6 leading-relaxed">
+                        "Foi um prazer ser atendida por esta equipe, o atendimento foi bem além das expectativas. Foram muito profissionais!"
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-clinic-gold text-white font-bold flex items-center justify-center transition-transform duration-500 hover:scale-110 hover:rotate-12">R</div>
+                        <div>
+                            <h4 class="font-bold text-sm text-clinic-dark">Raimunda Pereira de Freitas</h4>
+                            <span class="text-xs text-gray-500">Cliente Verificada</span>
                         </div>
                     </div>
-
-                    <a href="https://wa.me/9984358685" target="_blank" class="inline-block bg-clinic-gold hover:bg-clinic-goldHover text-white px-8 py-3.5 rounded-full font-medium text-sm transition-all btn-primary mt-4">
-                        <i class="fab fa-whatsapp mr-2"></i> Iniciar Conversa no WhatsApp
-                    </a>
                 </div>
 
-                <!-- Card de Chamada -->
-                <div class="bg-white p-8 rounded-3xl shadow-xl border border-clinic-gold/20 text-center space-y-6 reveal reveal-right">
-                    <h3 class="text-2xl font-serif font-bold text-clinic-dark">Agende sua avaliação</h3>
-                    <p class="text-gray-600 text-sm">Clique no botão abaixo para escolher o melhor dia e horário para seu atendimento.</p>
-                    <a href="https://wa.me/9984358685?text=Olá,%20gostaria%20de%20agendar%20uma%20consulta!" target="_blank" class="w-full block bg-clinic-gold hover:bg-clinic-goldHover text-white py-4 rounded-full font-medium transition-all shadow-md btn-pulse">
-                        Agendar via WhatsApp
-                    </a>
+                <div class="testimonial-card bg-clinic-sand p-8 rounded-2xl border border-clinic-gold/20 relative shadow-sm reveal reveal-right">
+                    <i class="fas fa-quote-left quote-icon text-clinic-gold/20 text-4xl absolute top-6 right-6"></i>
+                    <p class="text-gray-700 italic mb-6 leading-relaxed">
+                        "Atendimento excelente do começo ao fim😍, recomendo muito! Estou apaixonada nessa clínica!"
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-clinic-gold text-white font-bold flex items-center justify-center transition-transform duration-500 hover:scale-110 hover:rotate-12">W</div>
+                        <div>
+                            <h4 class="font-bold text-sm text-clinic-dark">Watyla Brito</h4>
+                            <span class="text-xs text-gray-500">Cliente Verificada</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Rodapé -->
-    <footer class="text-white/80 py-12 border-t border-white/10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:flex sm:justify-between sm:items-center">
-            <p class="text-xs sm:text-sm text-gray-400">
-                &copy; 2026 Clínica de Estética Dra. Cintya Freitas. Todos os direitos reservados.
-            </p>
-            <p class="text-xs text-gray-500 mt-4 sm:mt-0">
-                Estreito - MA
-            </p>
+    <footer id="contato" class="bg-clinic-dark text-white pt-16 pb-12 relative overflow-hidden">
+        <!-- Decoração animada no footer -->
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-clinic-gold to-transparent" style="background-size: 200% 100%; animation: shimmer 4s linear infinite;"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid md:grid-cols-3 gap-10 pb-12 border-b border-gray-800">
+                <div class="reveal reveal-up" style="animation-delay: 0.1s;">
+                    <img src="logo.jpg" alt="Dra. Cintya Freitas" class="h-14 w-auto mb-4 bg-white/10 p-2 rounded transition-transform duration-500 hover:scale-105">
+                    <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                        Centro de Saúde e Beleza especializado em proporcionar os melhores tratamentos estéticos com excelência e cuidado.
+                    </p>
+                </div>
+
+                <div class="reveal reveal-up" style="animation-delay: 0.2s;">
+                    <h4 class="font-bold text-lg mb-4 text-clinic-gold">Horário e Funcionamento</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li class="flex items-center gap-2 hover:translate-x-2 transition-transform"><i class="far fa-clock text-clinic-gold"></i> Segunda a Sexta: Fechamento às 17:00</li>
+                        <li class="flex items-center gap-2 hover:translate-x-2 transition-transform"><i class="fas fa-map-marker-alt text-clinic-gold"></i> Estreito - MA</li>
+                    </ul>
+                </div>
+
+                <div class="reveal reveal-up" style="animation-delay: 0.3s;">
+                    <h4 class="font-bold text-lg mb-4 text-clinic-gold">Agende sua Consulta</h4>
+                    <p class="text-sm text-gray-300 mb-4">Entre em contato via WhatsApp para tirar dúvidas e agendar sua avaliação.</p>
+                    <a href="https://wa.me/9984358685" target="_blank" class="btn-primary inline-flex items-center gap-2 bg-clinic-gold hover:bg-clinic-goldHover text-white px-6 py-3 rounded-full text-sm font-semibold btn-pulse">
+                        <i class="fab fa-whatsapp"></i> Falar pelo WhatsApp
+                    </a>
+                </div>
+            </div>
+
+            <div class="pt-8 text-center text-xs text-gray-500 reveal reveal-up">
+                <p>&copy; 2026 Clínica de Estética Dra. Cintya Freitas. Todos os direitos reservados.</p>
+            </div>
         </div>
     </footer>
 
-    <!-- DNA Flutuante Interativo -->
-    <div class="floating-dna" id="floatingDna">
+    <!-- Botão Voltar ao Topo -->
+    <button id="scrollTopBtn" class="fixed bottom-6 right-6 z-40 bg-clinic-gold hover:bg-clinic-goldHover text-white w-12 h-12 rounded-full shadow-xl opacity-0 invisible transition-all duration-500 hover:scale-110" aria-label="Voltar ao topo">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- DNA FLUTUANTE ARRASTÁVEL -->
+    <div id="floatingDNA" class="floating-dna" title="Arraste-me! 🧬">
+        <!-- Aura de brilho -->
         <div class="dna-aura"></div>
-        <div class="dna-ring"></div>
-        <canvas class="dna-canvas" id="dnaCanvas"></canvas>
-        <div class="dna-hint">Arraste a Hélice ✨</div>
+        
+        <!-- Container do DNA (dupla hélice 3D) -->
+        <div class="dna-container">
+            <div class="dna-core"></div>
+            <div class="dna-helix">
+                <div class="dna-rung" style="--i:0"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
+                <div class="dna-rung" style="--i:1"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
+                <div class="dna-rung" style="--i:2"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
+                <div class="dna-rung" style="--i:3"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
+                <div class="dna-rung" style="--i:4"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
+                <div class="dna-rung" style="--i:5"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
+                <div class="dna-rung" style="--i:6"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
+                <div class="dna-rung" style="--i:7"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
+                <div class="dna-rung" style="--i:8"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
+                <div class="dna-rung" style="--i:9"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
+                <div class="dna-rung" style="--i:10"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
+                <div class="dna-rung" style="--i:11"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
+                <div class="dna-rung" style="--i:12"><span class="dna-bar"></span><span class="dna-node a"></span><span class="dna-node b"></span></div>
+            </div>
+        </div>
+
+        <!-- Sparkles ao redor do DNA -->
+        <i class="fas fa-sparkles dna-sparkle" style="top: 10%; left: -5%;"></i>
+        <i class="fas fa-sparkles dna-sparkle" style="top: 50%; right: -10%; animation-delay: 1s;"></i>
+        <i class="fas fa-sparkles dna-sparkle" style="bottom: 10%; left: -8%; animation-delay: 2s;"></i>
+        <i class="fas fa-star dna-sparkle" style="top: 30%; right: -5%; animation-delay: 0.5s; font-size: 8px;"></i>
+
+        <!-- Dica de arrastar -->
+        <div class="dna-hint">Arraste-me 🧬</div>
     </div>
 
-    <!-- Toast Notification Mobile -->
-    <div class="toast" id="toast">
-        <span id="toastMsg">Mensagem</span>
-    </div>
-
-    <!-- SCRIPTS INTERATIVOS -->
     <script>
-        // Preloader
+        // ===== PRELOADER =====
         window.addEventListener('load', () => {
-            const preloader = document.getElementById('preloader');
-            if(preloader) {
-                preloader.classList.add('hidden');
-            }
+            setTimeout(() => {
+                document.getElementById('preloader').classList.add('hidden');
+            }, 400);
         });
 
-        // Header Scroll
+        // ===== SCROLL REVEAL =====
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    // Não desobserva para permitir reanimação se sair e voltar
+                }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // ===== HEADER SCROLL EFFECT =====
         const header = document.getElementById('header');
         window.addEventListener('scroll', () => {
-            if (window.scrollY > 30) {
+            if (window.scrollY > 50) {
                 header.classList.add('scrolled');
             } else {
                 header.classList.remove('scrolled');
             }
-        });
 
-        // Mobile Menu Toggle
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
-
-        mobileMenuBtn.addEventListener('click', () => {
-            mobileMenuBtn.classList.toggle('active');
-            mobileMenu.classList.toggle('hidden');
-            if (!mobileMenu.classList.contains('hidden')) {
-                mobileMenu.style.maxHeight = mobileMenu.scrollHeight + "px";
+            // Botão voltar ao topo
+            const topBtn = document.getElementById('scrollTopBtn');
+            if (window.scrollY > 400) {
+                topBtn.style.opacity = '1';
+                topBtn.style.visibility = 'visible';
             } else {
-                mobileMenu.style.maxHeight = "0";
+                topBtn.style.opacity = '0';
+                topBtn.style.visibility = 'hidden';
             }
         });
 
-        // Fechar menu mobile ao clicar no link
-        document.querySelectorAll('#mobileMenu a').forEach(link => {
+        // ===== BOTÃO VOLTAR AO TOPO =====
+        document.getElementById('scrollTopBtn').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // ===== MENU MOBILE =====
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileBtn.addEventListener('click', () => {
+            mobileBtn.classList.toggle('active');
+            mobileMenu.classList.toggle('hidden');
+            if (!mobileMenu.classList.contains('hidden')) {
+                mobileMenu.style.maxHeight = mobileMenu.scrollHeight + 'px';
+            } else {
+                mobileMenu.style.maxHeight = '0';
+            }
+        });
+
+        // Fechar menu ao clicar em um link
+        mobileMenu.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
-                mobileMenuBtn.classList.remove('active');
+                mobileBtn.classList.remove('active');
                 mobileMenu.classList.add('hidden');
-                mobileMenu.style.maxHeight = "0";
+                mobileMenu.style.maxHeight = '0';
             });
         });
 
-        // Scroll Reveal Animations
-        const revealElements = document.querySelectorAll('.reveal');
-        const revealOnScroll = () => {
-            const windowHeight = window.innerHeight;
-            revealElements.forEach(el => {
-                const elementTop = el.getBoundingClientRect().top;
-                if (elementTop < windowHeight - 80) {
-                    el.classList.add('active');
+        // ===== EFEITO RIPPLE EM BOTÕES =====
+        document.querySelectorAll('.btn-primary').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                const ripple = document.createElement('span');
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+                ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+                ripple.style.position = 'absolute';
+                ripple.style.background = 'rgba(255,255,255,0.4)';
+                ripple.style.borderRadius = '50%';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'rippleEffect 0.6s ease-out';
+                ripple.style.pointerEvents = 'none';
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Keyframe dinâmico para o ripple
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes rippleEffect {
+                to { transform: scale(4); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // ===== CURSOR SPARKLE (decorativo - apenas desktop) =====
+        const heroSection = document.getElementById('inicio');
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        
+        if (!isTouchDevice) {
+            heroSection.addEventListener('mousemove', (e) => {
+                if (Math.random() > 0.92) {
+                    const sparkle = document.createElement('i');
+                    sparkle.className = 'fas fa-sparkles';
+                    sparkle.style.position = 'absolute';
+                    sparkle.style.left = e.clientX - heroSection.getBoundingClientRect().left + 'px';
+                    sparkle.style.top = e.clientY - heroSection.getBoundingClientRect().top + 'px';
+                    sparkle.style.color = '#B39268';
+                    sparkle.style.fontSize = '12px';
+                    sparkle.style.pointerEvents = 'none';
+                    sparkle.style.animation = 'sparkle 1s ease-out forwards';
+                    sparkle.style.zIndex = '5';
+                    heroSection.appendChild(sparkle);
+                    setTimeout(() => sparkle.remove(), 1000);
                 }
             });
-        };
-        window.addEventListener('scroll', revealOnScroll);
-        revealOnScroll(); // trigger inicial
+        }
 
-        // Toast Helper
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMsg');
-            toastMsg.innerText = message;
-            toast.classList.add('show');
+        // ===== MOBILE: CLASSE NO BODY PARA IDENTIFICAÇÃO =====
+        if (isTouchDevice) {
+            document.body.classList.add('touch-device');
+        }
+
+        // ===== TOUCH FEEDBACK NOS CARDS =====
+        const procedureCards = document.querySelectorAll('.procedure-card');
+        procedureCards.forEach(card => {
+            // Touch start - feedback visual
+            card.addEventListener('touchstart', function(e) {
+                this.classList.add('touched');
+                const rect = this.getBoundingClientRect();
+                const touch = e.touches[0];
+                const x = ((touch.clientX - rect.left) / rect.width) * 100;
+                const y = ((touch.clientY - rect.top) / rect.height) * 100;
+                this.style.setProperty('--touch-x', x + '%');
+                this.style.setProperty('--touch-y', y + '%');
+            }, { passive: true });
+
+            card.addEventListener('touchend', function() {
+                setTimeout(() => this.classList.remove('touched'), 600);
+            }, { passive: true });
+        });
+
+        // ===== TAP EFFECT EM TODOS OS BOTÕES =====
+        document.querySelectorAll('button, a').forEach(el => {
+            el.addEventListener('touchstart', function() {
+                this.classList.add('tap-effect');
+            }, { passive: true });
+            el.addEventListener('touchend', function() {
+                setTimeout(() => this.classList.remove('tap-effect'), 300);
+            }, { passive: true });
+        });
+
+        // ===== GALERIA - TOQUE PARA EXPANDIR =====
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        galleryItems.forEach(item => {
+            let tapCount = 0;
+            item.addEventListener('click', function() {
+                tapCount++;
+                // Toast no mobile informando sobre a foto
+                if (window.innerWidth <= 768 && tapCount === 1) {
+                    showToast('📸 ' + this.querySelector('img').alt);
+                }
+            });
+        });
+
+        // ===== TOAST NOTIFICATION =====
+        function showToast(message, duration = 2500) {
+            // Remove toast anterior se existir
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            // Força reflow para animação funcionar
+            setTimeout(() => toast.classList.add('show'), 10);
             setTimeout(() => {
                 toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, duration);
+        }
+
+        // Toast de boas-vindas no mobile (apenas primeira visita)
+        if (isTouchDevice && !sessionStorage.getItem('welcomeShown')) {
+            setTimeout(() => {
+                showToast('✨ Deslize para explorar nossos tratamentos', 3000);
+                sessionStorage.setItem('welcomeShown', 'true');
+            }, 2000);
+        }
+
+        // ===== SCROLL INDICATOR MOBILE - SWIPE HINT =====
+        if (isTouchDevice) {
+            // Mostra dica de scroll após 3 segundos
+            setTimeout(() => {
+                const scrollIndicator = document.querySelector('.scroll-indicator');
+                if (scrollIndicator && window.scrollY < 100) {
+                    scrollIndicator.classList.remove('hidden', 'lg:flex');
+                    scrollIndicator.classList.add('flex');
+                }
             }, 3000);
         }
 
-        // Renderização Canvas do DNA Flutuante
-        const canvas = document.getElementById('dnaCanvas');
-        const ctx = canvas.getContext('2d');
-        let dnaAngle = 0;
-
-        function resizeCanvas() {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
+        // ===== PERFORMANCE: DESABILITA PARALLAX EM MOBILE =====
+        if (!isTouchDevice) {
+            window.addEventListener('scroll', () => {
+                const scrolled = window.pageYOffset;
+                const decorations = document.querySelectorAll('.hero-decoration');
+                decorations.forEach((dec, i) => {
+                    const speed = 0.3 + (i * 0.1);
+                    dec.style.transform = `translateY(${scrolled * speed}px)`;
+                });
+            });
         }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
 
-        function drawDNA() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const numNodes = 10;
-            const width = canvas.width;
-            const height = canvas.height;
-            const centerY = height / 2;
-            const radius = width * 0.35;
+        // ===== INTERSECTION OBSERVER PARA GALLERY SWIPE HINT =====
+        if (isTouchDevice) {
+            const galleryObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.classList.add('show-tap');
+                            setTimeout(() => entry.target.classList.remove('show-tap'), 1500);
+                        }, 500);
+                        galleryObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
 
-            for (let i = 0; i < numNodes; i++) {
-                const y = (height / (numNodes - 1)) * i;
-                const offset = (i * 0.5) + dnaAngle;
+            galleryItems.forEach(item => galleryObserver.observe(item));
+        }
 
-                const x1 = (width / 2) + Math.sin(offset) * radius;
-                const x2 = (width / 2) - Math.sin(offset) * radius;
+        // ===== ANIMAÇÃO DE CONTAGEM NOS PREÇOS (MOBILE & DESKTOP) =====
+        const priceElements = document.querySelectorAll('.procedure-card span');
+        const priceObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'zoomIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards';
+                    priceObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
 
-                const z1 = Math.cos(offset);
-                const z2 = -Math.cos(offset);
+        priceElements.forEach(el => priceObserver.observe(el));
 
-                // Linha de conexão
-                ctx.beginPath();
-                ctx.moveTo(x1, y);
-                ctx.lineTo(x2, y);
-                ctx.strokeStyle = 'rgba(179, 146, 104, 0.4)';
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
+        // ===== VIBRAÇÃO SUTIL NO TAP (se suportado) =====
+        document.querySelectorAll('.btn-primary').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if ('vibrate' in navigator && isTouchDevice) {
+                    navigator.vibrate(15);
+                }
+            });
+        });
 
-                // Esfera 1
-                ctx.beginPath();
-                ctx.arc(x1, y, 4 + z1 * 2, 0, Math.PI * 2);
-                ctx.fillStyle = z1 > 0 ? '#B39268' : '#D4B88C';
-                ctx.fill();
+        // ===== DNA FLUTUANTE ARRASTÁVEL (mouse + toque + caneta) =====
+        // Usa Pointer Events: um único código que funciona em PC e celular.
+        const dna = document.getElementById('floatingDNA');
+        const dnaHint = dna.querySelector('.dna-hint');
+        const dnaIsTouch = window.matchMedia('(pointer: coarse)').matches || isTouchDevice;
 
-                // Esfera 2
-                ctx.beginPath();
-                ctx.arc(x2, y, 4 + z2 * 2, 0, Math.PI * 2);
-                ctx.fillStyle = z2 > 0 ? '#B39268' : '#D4B88C';
-                ctx.fill();
+        if (dnaIsTouch && dnaHint) dnaHint.textContent = 'Toque e arraste 🧬';
+
+        const dnaState = {
+            x: 0, y: 0,               // centro do DNA (coordenadas da tela)
+            vx: 0, vy: 0,             // velocidade (px por frame a 60fps)
+            dragging: false,
+            pointerId: null,
+            offX: 0, offY: 0,         // distância entre o dedo e o centro do DNA
+            lastX: 0, lastY: 0, lastT: 0,
+            downX: 0, downY: 0, downT: 0,
+            moved: false,
+            lastTap: 0,
+            returning: false,         // animação de volta ao centro
+            resumeAt: 0,              // quando o movimento automático volta
+            wanderAngle: Math.random() * Math.PI * 2,
+            wanderSpeed: dnaIsTouch ? 0.32 : 0.4
+        };
+
+        function dnaViewport() {
+            return {
+                w: document.documentElement.clientWidth || window.innerWidth,
+                h: window.innerHeight
+            };
+        }
+
+        function dnaBounds() {
+            const v = dnaViewport();
+            const hw = dna.offsetWidth / 2;
+            const hh = dna.offsetHeight / 2;
+            return { minX: hw, maxX: Math.max(hw, v.w - hw), minY: hh, maxY: Math.max(hh, v.h - hh) };
+        }
+
+        function clampDNA() {
+            const b = dnaBounds();
+            dnaState.x = Math.min(b.maxX, Math.max(b.minX, dnaState.x));
+            dnaState.y = Math.min(b.maxY, Math.max(b.minY, dnaState.y));
+        }
+
+        // Rebate suavemente nas bordas da tela
+        function bounceDNA() {
+            const b = dnaBounds();
+            const s = dnaState;
+            if (s.x < b.minX)      { s.x = b.minX; s.vx = Math.abs(s.vx) * 0.6;  s.wanderAngle = Math.PI - s.wanderAngle; }
+            else if (s.x > b.maxX) { s.x = b.maxX; s.vx = -Math.abs(s.vx) * 0.6; s.wanderAngle = Math.PI - s.wanderAngle; }
+            if (s.y < b.minY)      { s.y = b.minY; s.vy = Math.abs(s.vy) * 0.6;  s.wanderAngle = -s.wanderAngle; }
+            else if (s.y > b.maxY) { s.y = b.maxY; s.vy = -Math.abs(s.vy) * 0.6; s.wanderAngle = -s.wanderAngle; }
+        }
+
+        function renderDNA() {
+            const w = dna.offsetWidth, h = dna.offsetHeight;
+            dna.style.transform = `translate3d(${dnaState.x - w / 2}px, ${dnaState.y - h / 2}px, 0)`;
+            // Dica aparece acima do DNA quando ele está na metade de baixo da tela
+            dna.classList.toggle('hint-above', dnaState.y > dnaViewport().h * 0.55);
+        }
+
+        function resetDNAToCenter() {
+            const s = dnaState;
+            s.vx = 0; s.vy = 0;
+            s.returning = true;
+            dna.classList.remove('pop');
+            void dna.offsetWidth;
+            dna.classList.add('pop');
+            showToast('🧬 DNA voltou ao centro!');
+        }
+
+        // ===== LOOP ÚNICO DE ANIMAÇÃO (inércia, retorno e movimento automático) =====
+        let dnaLastFrame = performance.now();
+        function dnaLoop(now) {
+            const s = dnaState;
+            const dt = Math.min((now - dnaLastFrame) / 16.667, 3); // normaliza para 60fps
+            dnaLastFrame = now;
+
+            if (!s.dragging) {
+                if (s.returning) {
+                    const v = dnaViewport();
+                    const ease = Math.min(0.12 * dt, 1);
+                    s.x += (v.w / 2 - s.x) * ease;
+                    s.y += (v.h / 2 - s.y) * ease;
+                    if (Math.hypot(v.w / 2 - s.x, v.h / 2 - s.y) < 1.5) {
+                        s.returning = false;
+                        s.resumeAt = now + 2000;
+                    }
+                } else if (Math.hypot(s.vx, s.vy) > 0.3) {
+                    // Inércia depois de soltar
+                    s.x += s.vx * dt;
+                    s.y += s.vy * dt;
+                    const friction = Math.pow(0.93, dt);
+                    s.vx *= friction;
+                    s.vy *= friction;
+                    s.resumeAt = Math.max(s.resumeAt, now + 1500);
+                } else {
+                    s.vx = 0; s.vy = 0;
+                    if (now >= s.resumeAt) {
+                        // Passeio automático suave
+                        s.wanderAngle += (Math.random() - 0.5) * 0.3 * dt;
+                        s.x += Math.cos(s.wanderAngle) * s.wanderSpeed * dt;
+                        s.y += Math.sin(s.wanderAngle) * s.wanderSpeed * dt;
+                    }
+                }
+                bounceDNA();
+                renderDNA();
             }
-
-            dnaAngle += 0.03;
-            requestAnimationFrame(drawDNA);
-        }
-        drawDNA();
-
-        // Arrastar DNA (Drag & Drop)
-        const dnaEl = document.getElementById('floatingDna');
-        let isDragging = false;
-        let startX, startY, initialLeft, initialTop;
-
-        function onPointerDown(e) {
-            isDragging = true;
-            dnaEl.classList.add('dragging');
-            document.body.classList.add('dna-dragging');
-
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-            startX = clientX;
-            startY = clientY;
-
-            const rect = dnaEl.getBoundingClientRect();
-            initialLeft = rect.left + rect.width / 2;
-            initialTop = rect.top + rect.height / 2;
+            requestAnimationFrame(dnaLoop);
         }
 
-        function onPointerMove(e) {
-            if (!isDragging) return;
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        // ===== ARRASTAR: mouse, dedo ou caneta =====
+        dna.addEventListener('pointerdown', (e) => {
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            if (dnaState.dragging) return; // ignora um segundo dedo
+            e.preventDefault();
 
-            const deltaX = clientX - startX;
-            const deltaY = clientY - startY;
+            const s = dnaState;
+            s.dragging = true;
+            s.pointerId = e.pointerId;
+            s.returning = false;
+            s.moved = false;
+            s.offX = s.x - e.clientX;
+            s.offY = s.y - e.clientY;
+            s.lastX = s.downX = e.clientX;
+            s.lastY = s.downY = e.clientY;
+            s.lastT = s.downT = performance.now();
+            s.vx = 0; s.vy = 0;
 
-            dnaEl.style.left = `${initialLeft + deltaX}px`;
-            dnaEl.style.top = `${initialTop + deltaY}px`;
-        }
+            try { dna.setPointerCapture(e.pointerId); } catch (err) {}
 
-        function onPointerUp() {
-            if (isDragging) {
-                isDragging = false;
-                dnaEl.classList.remove('dragging');
-                document.body.classList.remove('dna-dragging');
+            dna.classList.remove('show-hint', 'attention');
+            dna.classList.add('dragging');
+            if (navigator.vibrate && dnaIsTouch) navigator.vibrate(10);
+        });
+
+        dna.addEventListener('pointermove', (e) => {
+            const s = dnaState;
+            if (!s.dragging || e.pointerId !== s.pointerId) return;
+            e.preventDefault();
+
+            const now = performance.now();
+            const frames = Math.max((now - s.lastT) / 16.667, 0.5);
+
+            s.x = e.clientX + s.offX;
+            s.y = e.clientY + s.offY;
+            clampDNA();
+
+            // Velocidade suavizada (para a inércia ao soltar)
+            s.vx = s.vx * 0.4 + ((e.clientX - s.lastX) / frames) * 0.6;
+            s.vy = s.vy * 0.4 + ((e.clientY - s.lastY) / frames) * 0.6;
+
+            s.lastX = e.clientX;
+            s.lastY = e.clientY;
+            s.lastT = now;
+
+            if (Math.hypot(e.clientX - s.downX, e.clientY - s.downY) > 6) s.moved = true;
+            renderDNA();
+        });
+
+        function endDNADrag(e, cancelled) {
+            const s = dnaState;
+            if (!s.dragging || e.pointerId !== s.pointerId) return;
+
+            s.dragging = false;
+            dna.classList.remove('dragging');
+            try { dna.releasePointerCapture(e.pointerId); } catch (err) {}
+
+            const now = performance.now();
+
+            // Se o dedo parou antes de soltar, não há inércia
+            if (now - s.lastT > 90) { s.vx = 0; s.vy = 0; }
+
+            // Limita a velocidade máxima do arremesso
+            const maxV = 32;
+            const speed = Math.hypot(s.vx, s.vy);
+            if (speed > maxV) { s.vx = s.vx / speed * maxV; s.vy = s.vy / speed * maxV; }
+
+            s.resumeAt = now + 3000; // volta a passear sozinho depois de 3s
+
+            // Toque simples / duplo toque (sem arrastar)
+            if (!cancelled && !s.moved && now - s.downT < 350) {
+                s.vx = 0; s.vy = 0;
+                if (now - s.lastTap < 400) {
+                    s.lastTap = 0;
+                    resetDNAToCenter();      // duplo toque = volta ao centro
+                } else {
+                    s.lastTap = now;
+                    dna.classList.remove('pop');
+                    void dna.offsetWidth;
+                    dna.classList.add('pop'); // toque simples = pulso de brilho
+                }
             }
         }
 
-        dnaEl.addEventListener('mousedown', onPointerDown);
-        dnaEl.addEventListener('touchstart', onPointerDown, { passive: true });
+        dna.addEventListener('pointerup', (e) => endDNADrag(e, false));
+        dna.addEventListener('pointercancel', (e) => endDNADrag(e, true));
 
-        window.addEventListener('mousemove', onPointerMove);
-        window.addEventListener('touchmove', onPointerMove, { passive: true });
+        // Evita menu de "segurar" e arrastar imagem nativo no celular
+        dna.addEventListener('contextmenu', (e) => e.preventDefault());
+        dna.addEventListener('dragstart', (e) => e.preventDefault());
 
-        window.addEventListener('mouseup', onPointerUp);
-        window.addEventListener('touchend', onPointerUp);
+        // ===== AJUSTA AO GIRAR O CELULAR / REDIMENSIONAR =====
+        function onDNAResize() {
+            clampDNA();
+            renderDNA();
+        }
+        window.addEventListener('resize', onDNAResize);
+        window.addEventListener('orientationchange', () => setTimeout(onDNAResize, 250));
+        if (window.visualViewport) window.visualViewport.addEventListener('resize', onDNAResize);
+
+        // ===== INICIALIZAÇÃO =====
+        (function initDNA() {
+            const v = dnaViewport();
+            dnaState.x = v.w / 2;
+            dnaState.y = v.h / 2;
+            dnaState.resumeAt = performance.now() + 1200;
+            renderDNA();
+            requestAnimationFrame(dnaLoop);
+
+            // Dica inicial
+            setTimeout(() => {
+                dna.classList.add('show-hint');
+                setTimeout(() => dna.classList.remove('show-hint'), 3800);
+            }, 2500);
+
+            // No celular, pulsa o brilho para chamar atenção
+            if (dnaIsTouch) {
+                setTimeout(() => {
+                    dna.classList.add('attention');
+                    setTimeout(() => dna.classList.remove('attention'), 4600);
+                }, 3500);
+            }
+        })();
+
+
     </script>
+
 </body>
 </html>
